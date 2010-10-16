@@ -150,20 +150,14 @@ fu.get("/style.css", fu.staticHandler("style.css"));
 fu.get("/client.js", fu.staticHandler("client.js"));
 fu.get("/jquery-1.2.6.min.js", fu.staticHandler("jquery-1.2.6.min.js"));
 
-var chatListUpdateRequests = [];
-
 fu.get("/getchats", function (req, res) {
 
 	var allChats = {};
   for(prop in rooms)
   {
-	allChats[prop] = rooms[prop];
+  	allChats[prop] = rooms[prop];
   }
-  while (chatListUpdateRequests.length) {
-		response = chatListUpdateRequests.shift();
-		response.simpleJSON(200, { rooms: allChats
-        });
-	}
+  res.simpleJSON(200, {rooms: allChats});
   
 });
 
