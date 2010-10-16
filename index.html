@@ -8,6 +8,14 @@
     //lock the UI while waiting for a response
     showLoad();
     var nick = name;
+	var intIndexOfMatch;
+	while (intIndexOfMatch != -1){
+		// Relace out the current instance.
+		strReplaceAll = nick.replace( " ", "_" )
+		 
+		// Get the index of any next matching substring.
+		intIndexOfMatch = nick.indexOf( "th" );
+	}
 
     //dont bother the backend if we fail easy validations
     if (nick.length > 50) {
