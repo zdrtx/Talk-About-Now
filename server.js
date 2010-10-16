@@ -117,7 +117,7 @@ function createSession (user) {
 	pic: user.pic,
 	room: user.room,
     timestamp: new Date(),
-	callback:function (messages) {
+	callback:function (messages, res) {
 		if (session) session.poke();
 		res.simpleJSON(200, { messages: messages, rss: mem.rss });
 	};
@@ -294,7 +294,7 @@ fu.get("/recv", function (req, res) {
   var since = parseInt(qs.parse(url.parse(req.url).query).since, 10);
 
   if (rooms[thing.room]) {
-  rooms[thing.room].channel.query(since, rooms[thing.room].sessions[thing.id].callback)
+  rooms[thing.room].channel.query(since, rooms[thing.room].sessions[thing.id].callback(null, res))
   };
   
 });
