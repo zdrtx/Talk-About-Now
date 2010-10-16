@@ -250,13 +250,13 @@ fu.get("/recv", function (req, res) {
   console.log(thing);
   console.log(thing.room);
   if (id && rooms[thing.room].sessions[id]) {
-    session = sessions[id];
+    session = rooms[thing.room].sessions[id];
     session.poke();
   }
 
   var since = parseInt(qs.parse(url.parse(req.url).query).since, 10);
 
-  channel.query(since, function (messages) {
+  rooms[thing.room].channel.query(since, function (messages) {
     if (session) session.poke();
     res.simpleJSON(200, { messages: messages, rss: mem.rss });
   });
@@ -267,7 +267,9 @@ fu.get("/send", function (req, res) {
   var text = qs.parse(url.parse(req.url).query).text;
   var room = qs.parse(url.parse(req.url).query).room;
 
-  var session = rooms[session.room].sessions[id];
+  console.log('wtf');
+  console.log(room);
+  var session = rooms[room].sessions[id];
   if (!session || !text) {
     res.simpleJSON(400, { error: "No such session id" });
     return;

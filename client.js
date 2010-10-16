@@ -401,8 +401,6 @@ function onConnect (session) {
     return;
   }
 
-  longPoll();
-
   CONFIG.name = session.name;
   CONFIG.id   = session.id;
   CONFIG.room = session.room;
@@ -428,6 +426,7 @@ function onConnect (session) {
     CONFIG.unread = 0;
     updateTitle();
   });
+  longPoll();
 }
 
 //add a list of present chat members to the stream
