@@ -152,19 +152,15 @@ fu.get("/jquery-1.2.6.min.js", fu.staticHandler("jquery-1.2.6.min.js"));
 
 
 fu.get("/getchats", function (req, res) {
-
-	var allChats = {};
+  var allChats = {};
   for(prop in rooms)
   {
 	allChats[prop] = rooms[prop];
   }
-  while (requests.length) {
-		response = requests.shift();
-		response.simpleJSON(200, { rooms: allChats
-        };
-	}
-  
+  res.simpleJSON(200, { rooms: allChats
+                      });
 });
+
 
 fu.get("/who", function (req, res) {
   var names = [];
