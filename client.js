@@ -9,7 +9,7 @@ var CONFIG = { debug: false
              , unread: 0 //updated in the message-processing loop
              };
 
-var uids = [];
+var users = [];
 
 //  CUT  ///////////////////////////////////////////////////////////////////
 /* This license and copyright apply to all code until the next "CUT"
@@ -112,8 +112,8 @@ Date.fromString = function(str) {
 
 //updates the users link to reflect the number of active users
 function updateUsersLink ( ) {
-  var t = uids.length.toString() + " user";
-  if (uids.length != 1) t += "s";
+  var t = users.length.toString() + " user";
+  if (users.length != 1) t += "s";
   $("#usersLink").text(t);
 }
 
@@ -122,10 +122,10 @@ function userJoin(user, timestamp) {
   //put it in the stream
   addMessage(user, "joined", timestamp, "join");
   //if we already know about this user, ignore it
-  for (var i = 0; i < uids.length; i++)
-    if (uids[i] == user.id) return;
+  for (var i = 0; i < users.length; i++)
+    if (users[i].id == user.id) return;
   //otherwise, add the user to the list
-  uids.push(user.id);
+  users.push(user);
   //update the UI
   updateUsersLink();
 }
@@ -135,9 +135,9 @@ function userPart(user, timestamp) {
   //put it in the stream
   addMessage(user, "left", timestamp, "part");
   //remove the user from the list
-  for (var i = 0; i < uids.length; i++) {
-    if (uids[i] == id) {
-      uids.splice(i,1)
+  for (var i = 0; i < users.length; i++) {
+    if (users[i].id == id) {
+      users.splice(i,1)
       break;
     }
   }
@@ -433,6 +433,10 @@ function onConnect (session) {
 
 //add a list of present chat members to the stream
 function outputUsers (names) {
+  var names = [];
+  for (var i = 0; i < users.length; i++ ) {
+    names.push(users[i].name);
+  }
   var names_string = names.length > 0 ? names.join(", ") : "(none)";
   addMessage({name:"users:"}, names_string, new Date(), "notice");
   return false;
