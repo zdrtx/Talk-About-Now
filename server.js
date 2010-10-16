@@ -150,6 +150,17 @@ fu.get("/client.js", fu.staticHandler("client.js"));
 fu.get("/jquery-1.2.6.min.js", fu.staticHandler("jquery-1.2.6.min.js"));
 
 
+fu.get("/getchats", function (req, res) {
+  var allChats = {};
+  for(prop in rooms)
+  {
+	allChats["prop"] = rooms[prop];
+  }
+  res.simpleJSON(200, { rooms: allChats
+                      });
+});
+
+
 fu.get("/who", function (req, res) {
   var names = [];
   var roomId = qs.parse(url.parse(req.url).query).room;
@@ -212,17 +223,14 @@ fu.get("/create", function (req, res) {
     return;
   }
 
-  //sys.puts("connection: " + name + "@" + res.connection.remoteAddress);
-
+	
   rooms[session.room].channel.appendMessage(session.name, "join");
-  console.log('bambam');
   res.simpleJSON(200, { id: newroom.id
                       , name: newroom.name
                       , room: newroom.room
                       , rss: mem.rss
                       , starttime: starttime
                       });
-  console.log('never will happen');
 });
 
 

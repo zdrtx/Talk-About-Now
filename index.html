@@ -3,30 +3,30 @@
     <link rel="stylesheet" href="style.css" type="text/css"/>
     <script src="jquery-1.2.6.min.js" type="text/javascript"></script>
     <script src="client.js" type="text/javascript"></script>
-    <script type="text/javascript">
-      function onLogin (){
-    //lock the UI while waiting for a response
-    showLoad();
-    console.log(CONFIG);
-
-    //make the actual join request to the server
-    $.ajax({ cache: false
+    <title>node chat</title>
+	<script type="text/javascript">
+		function updateChats(chats){
+			for(chat c in chats)
+			{
+				var link = "<a href='"+c.id+"'>"+c.title+"</a>";
+				$("#currentChats").append(link);
+			}
+		}
+	
+		$(document).ready(function(){
+			$.ajax({ cache: false
            , type: "GET" // XXX should be POST
            , dataType: "json"
-           , url: "/join"
-           , data: { id: CONFIG.id, name: CONFIG.name, profile: CONFIG.url, pic: CONFIG.pic }
+           , url: "/getchats"
+           , data: {}
            , error: function () {
-               alert("error connecting to server");
+               alert("error creating chat");
                showConnect();
              }
-           , success: onConnect
-           });
-    return false;
-  }
-	  
-	  
-    </script>
-    <title>node chat</title>
+           , success: updateChats
+           });		
+		});
+	</script>
   </head>
   <body>
     <div id="app">
@@ -41,6 +41,9 @@
             <input name="createChat" type="button" id="create" value="Create">
           </fieldset>
         </form>
+		<div id="currentChats">
+			
+		</div>
       </div>
       <div id="loading"><p>loading</p></div>
       <div id="log"></div>
