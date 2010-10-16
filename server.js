@@ -136,7 +136,7 @@ setInterval(function () {
   var now = new Date();
   for( var room in rooms)
   {
-	  for (var id in rooms["room"].sessions) {
+	  for (var id in rooms[room].sessions) {
 		if (!sessions.hasOwnProperty(id)) continue;
 		var session = sessions[id];
 
