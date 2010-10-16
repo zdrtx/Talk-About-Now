@@ -150,7 +150,6 @@ fu.get("/style.css", fu.staticHandler("style.css"));
 fu.get("/client.js", fu.staticHandler("client.js"));
 fu.get("/jquery-1.2.6.min.js", fu.staticHandler("jquery-1.2.6.min.js"));
 
-
 var chatListUpdateRequests = [];
 
 fu.get("/getchats", function (req, res) {
