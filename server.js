@@ -23,22 +23,24 @@ var channel = new function () {
   var messages = [],
       callbacks = [];
 
-  this.appendMessage = function (nick, type, text) {
-    var m = { nick: nick
+  this.appendMessage = function (name, type, text) {
+    var m = { name: name
             , type: type // "msg", "join", "part"
             , text: text
+            , profile: profile
+            , pic: pic
             , timestamp: (new Date()).getTime()
             };
 
     switch (type) {
       case "msg":
-        sys.puts("<" + nick + "> " + text);
+        sys.puts("<" + name + "> " + text);
         break;
       case "join":
-        sys.puts(nick + " join");
+        sys.puts(name + " join");
         break;
       case "part":
-        sys.puts(nick + " part");
+        sys.puts(name + " part");
         break;
     }
 
@@ -98,7 +100,7 @@ function createSession (user) {
     },
 
     destroy: function () {
-      channel.appendMessage(session.nick, "part");
+      channel.appendMessage(session.name, "part");
       delete sessions[session.id];
     }
   };
@@ -129,13 +131,13 @@ fu.get("/jquery-1.2.6.min.js", fu.staticHandler("jquery-1.2.6.min.js"));
 
 
 fu.get("/who", function (req, res) {
-  var nicks = [];
+  var names = [];
   for (var id in sessions) {
     if (!sessions.hasOwnProperty(id)) continue;
     var session = sessions[id];
-    nicks.push(session.nick);
+    names.push(session.name);
   }
-  res.simpleJSON(200, { nicks: nicks
+  res.simpleJSON(200, { names: names
                       , rss: mem.rss
                       });
 });
@@ -153,11 +155,11 @@ fu.get("/join", function (req, res) {
     return;
   }
 
-  //sys.puts("connection: " + nick + "@" + res.connection.remoteAddress);
+  //sys.puts("connection: " + name + "@" + res.connection.remoteAddress);
 
   channel.appendMessage(session.name, "join");
-  res.simpleJSON(200, { id: session.id
-                      , name: session.name
+  res.simpleJSON(200, { id: user.id
+                      , name: user.name
                       , rss: mem.rss
                       , starttime: starttime
                       });
@@ -165,7 +167,7 @@ fu.get("/join", function (req, res) {
 
 fu.get("/part", function (req, res) {
   var id = qs.parse(url.parse(req.url).query).id;
-  var session;
+
   if (id && sessions[id]) {
     session = sessions[id];
     session.destroy();
@@ -205,6 +207,6 @@ fu.get("/send", function (req, res) {
 
   session.poke();
 
-  channel.appendMessage(session.name, "msg", text);
+  channel.appendMessage(session.name, "msg", text, session.profile);
   res.simpleJSON(200, { rss: mem.rss });
 });
