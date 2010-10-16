@@ -38,6 +38,13 @@
 		  padding:15px;
 		  border:1px solid #333;
 	  }
+	  
+	  #newChatForm
+	  {
+		width:500px;
+		margin:0 auto;
+		padding:20px;
+	  }
     </style>
 	<script type="text/javascript">
 		function updateChats(chats){
@@ -71,11 +78,11 @@
     <div id="app">
       <div id="connect">
 <div id="fbConnect"><fb:login-button autologoutlink="true"></fb:login-button></div>
-        <form action="#">
+        <form action="#" id="newChatForm">
           <fieldset> 
             <p>
               Create a Chat</p>
-            <input style="width:400px; line-height:140%; padding:5px;"id="createChat">
+            <input id="createChat">
             <input name="createChat" type="button" id="create" value="Create">
           </fieldset>
         </form>
