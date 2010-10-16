@@ -137,8 +137,8 @@ setInterval(function () {
   for( var room in rooms)
   {
 	  for (var id in rooms[room].sessions) {
-		if (!sessions.hasOwnProperty(id)) continue;
-		var session = sessions[id];
+		if (!rooms[room].sessions.hasOwnProperty(id)) continue;
+		var session = rooms[room].sessions[id];
 
 		if (now - session.timestamp > SESSION_TIMEOUT) {
 		  session.destroy();

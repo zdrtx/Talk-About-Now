@@ -116,7 +116,6 @@ function updateUsersLink ( ) {
   var t = users.length.toString() + " user";
   if (users.length != 1) t += "s";
   $("#usersLink").text(t);
-  $("#roomTitle").text(CONFIG.title);
 }
 
 //handles another person joining chat
@@ -473,7 +472,7 @@ $(document).ready(function() {
        href: 'http://128.62.170.45:8001/?c='+CONFIG.room,
      },
      action_links: [
-       { text: 'Code', href: 'http://128.62.170.45:8001?c='+CONFIG.room }
+       { text: 'Chat now!', href: 'http://128.62.170.45:8001?c='+CONFIG.room }
      ],
      user_message_prompt: 'Invite your friends to come chat with you!'
    },
