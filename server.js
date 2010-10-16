@@ -261,7 +261,8 @@ fu.get("/recv", function (req, res) {
   console.log('oh hai');
   console.log(thing);
   console.log(thing.room);
-  if (id && rooms[thing.room].sessions[id]) {
+  console.log(rooms[thing.room]);
+  if (id && thing.room && rooms[thing.room] && rooms[thing.room].sessions[id]) {
     session = rooms[thing.room].sessions[id];
     session.poke();
   }
