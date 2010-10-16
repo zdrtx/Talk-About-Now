@@ -80,14 +80,28 @@
 		}
 	
 		function updateChats(chats){
+			var usercount = 0;
+			var mincount = 0;
+			var maxcount = 0;
+			var roomcount = 0;
 			for(c in chats.rooms)
 			{
-				//var link = "<a class='joinChat' href='"+c+"'>"+chats.rooms[c].title+"</a>";
-			  var l = document.createElement("a");
-			  l.setAttribute('href', c);
-			  l.innerHTML = chats.rooms[c].title;
-        l.className = 'joinChat';
-			  $("#currentChats").append(l);
+				roomcount++;
+				usercount += c.population;
+				if(c.population < mincount)
+					mincount = c.population;
+				if(c.population > maxcount)
+					maxcount = c.population;
+			}
+			for(c in chats.rooms)
+			{
+				var textsize =  Math.ceil((18*(roomcount - mincount))/(maxcount - mincount));
+				var link = "<a class='joinChat' style='font-size:"+textsize+";' href='"+c+"'>"+chats.rooms[c].title+"</a>";
+			  //var l = document.createElement("a");
+			  //l.setAttribute('href', c);
+			  //l.innerHTML = chats.rooms[c].title;
+        //l.className = 'joinChat';
+			  $("#currentChats").append(link);
 			}
 		}
 	
@@ -109,6 +123,8 @@
   <body>
     <div id="app">
       <div id="connect">
+      <h2>ChatAboutNow</h2>
+      <p>Chat About Now offers a <strong>new way to chat with your friends</strong> and other interested in the same current events as you.</p><p>Start a new conversation using the textbox or join a current conversation by clicking one of the links below it.</p>
 <div id="fbConnect"><h3 style="text-align:center;"><fb:login-button
     autologoutlink="true"></fb:login-button> Log in with Facebook</h3></div>
         <form action="#" id="newChatForm" style="margin:0 auto; display: none;">
