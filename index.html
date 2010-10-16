@@ -8,6 +8,7 @@
     //lock the UI while waiting for a response
     showLoad();
     var nick = name;
+    console.log(nick);
 	var intIndexOfMatch;
 	while (intIndexOfMatch != -1){
 		// Relace out the current instance.
@@ -88,10 +89,25 @@
         
 		FB.getLoginStatus(function(response) {
 		if (response.session) {
+      console.log(response);
 			// logged in and connected user, someone you know
+      var person = {};
 			FB.api('/me', function(response) {
-          		onLogin(response.name);
+              person.name = response.name;
+              person.profile = response.link;
+              person.id = response.id;
+
+              console.log(response);
+          		//onLogin(response.name);
         	});
+      console.log(person);
+      console.log('/'+person.id+'/picture');
+      FB.api('/'+person.id+'/picture', function(response) {
+        console.log(response);
+        console.log(person);
+        onLogin(person.name);
+      });
+              
 		} else {
 		// no user session available, someone you dont know
 		}

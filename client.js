@@ -400,6 +400,7 @@ function onConnect (session) {
   updateUptime();
 
   //update the UI to show the chat
+  console.log(CONFIG.nick);
   showChat(CONFIG.nick);
 
   //listen for browser events so we know to update the document title
@@ -448,6 +449,7 @@ $(document).ready(function() {
     //lock the UI while waiting for a response
     showLoad();
     var nick = $("#nickInput").attr("value");
+    console.log(nick);
 
     //dont bother the backend if we fail easy validations
     if (nick.length > 50) {
