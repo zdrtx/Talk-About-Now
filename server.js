@@ -141,8 +141,9 @@ fu.get("/who", function (req, res) {
 });
 
 fu.get("/join", function (req, res) {
-	console.log(url.parse(req.url).query);
 	var user = qs.parse(url.parse(req.url).query);
+	alert(user.id);
+	alert(qs.parse(url.parse(req.url).query).id);
   
   if (user.id == null) {
     res.simpleJSON(400, {error: "Bad login."});
