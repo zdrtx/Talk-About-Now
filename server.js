@@ -117,7 +117,10 @@ function createSession (user) {
 	pic: user.pic,
 	room: user.room,
     timestamp: new Date(),
-
+	callback:function (messages) {
+		if (session) session.poke();
+		res.simpleJSON(200, { messages: messages, rss: mem.rss });
+	};
     poke: function () {
       session.timestamp = new Date();
     },
@@ -129,6 +132,7 @@ function createSession (user) {
         rooms[session.room].channel.appendMessage(user, "part");
 		if(rooms[session.room].sessions[session.id])
 		{
+			delete rooms[session.room].sessions[session.id].callback;
 			delete rooms[session.room].sessions[session.id];
 		}
       }
@@ -290,11 +294,9 @@ fu.get("/recv", function (req, res) {
   var since = parseInt(qs.parse(url.parse(req.url).query).since, 10);
 
   if (rooms[thing.room]) {
-  rooms[thing.room].channel.query(since, function (messages) {
-    if (session) session.poke();
-    res.simpleJSON(200, { messages: messages, rss: mem.rss });
-  });
-  }
+  rooms[thing.room].channel.query(since, rooms[thing.room].sessions[thing.id].callback)
+  };
+  
 });
 
 fu.get("/send", function (req, res) {
