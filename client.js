@@ -465,9 +465,10 @@ $(document).ready(function() {
 	});
 	
 	//Connect to an existing chat
-	  $(".joinChat").click(function(){
+	  $("a.joinChat").live("click", function(e) {
+      e.preventDefault();
 		showLoad();
-		var room = this.attr("src");
+		var room = this.attr("href");
 
     	$.ajax({ cache: false
            , type: "GET" // XXX should be POST

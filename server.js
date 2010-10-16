@@ -152,9 +152,11 @@ fu.get("/jquery-1.2.6.min.js", fu.staticHandler("jquery-1.2.6.min.js"));
 
 fu.get("/getchats", function (req, res) {
   var allChats = {};
+  console.log(rooms);
   for(prop in rooms)
   {
-	allChats["prop"] = rooms[prop];
+  console.log(prop);
+	allChats[prop] = rooms[prop];
   }
   res.simpleJSON(200, { rooms: allChats
                       });
@@ -238,7 +240,7 @@ fu.get("/create", function (req, res) {
 fu.get("/part", function (req, res) {
   var stuff = qs.parse(url.parse(req.url).query);
 
-  if (stuff && stuff.id) {
+  if (stuff && stuff.room && stuff.id && rooms[stuff.room]) {
     session = rooms[stuff.room].sessions[stuff.id];
     session.destroy();
   }
