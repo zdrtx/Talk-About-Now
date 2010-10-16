@@ -236,7 +236,7 @@ fu.get("/create", function (req, res) {
 
 //todo: deal w this
 fu.get("/part", function (req, res) {
-  var id = qs.parse(url.parse(req.url).query;
+  var id = qs.parse(url.parse(req.url).query).id;
 
   if (id && sessions[id]) {
     session = sessions[id];
