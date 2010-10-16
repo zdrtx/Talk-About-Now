@@ -120,7 +120,7 @@ function createSession (user) {
 	callback:function (messages) {
 		if (session) session.poke();
 		res.simpleJSON(200, { messages: messages, rss: mem.rss });
-	};
+	},
     poke: function () {
       session.timestamp = new Date();
     },
