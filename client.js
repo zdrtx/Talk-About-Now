@@ -1,4 +1,7 @@
 var CONFIG = { debug: false
+			 , name: "#"
+			 , url: "#"
+			 , pic: "#"
              , id: null    // set in onConnect
              , last_message_time: 1
              , focus: true //event listeners bound in onConnect
