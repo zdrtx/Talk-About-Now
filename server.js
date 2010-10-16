@@ -117,7 +117,7 @@ function createSession (user) {
     },
 
     destroy: function () {
-      channel.appendMessage(session.name, "part");
+      rooms[user.room].channel.appendMessage(session.name, "part");
       delete rooms[user.room].sessions[session.id];
     }
   };
@@ -228,12 +228,14 @@ fu.get("/create", function (req, res) {
 
 //todo: deal w this
 fu.get("/part", function (req, res) {
-  var id = qs.parse(url.parse(req.url).query).id;
+  var stuff = qs.parse(url.parse(req.url).query);
 
-  if (id && sessions[id]) {
-    session = sessions[id];
+  if (stuff && stuff.id) {
+    session = rooms[stuff.room].sessions[stuff.id];
     session.destroy();
   }
+
+  // get rid of stuff[room]
   res.simpleJSON(200, { rss: mem.rss });
 });
 

@@ -517,5 +517,5 @@ $(document).ready(function() {
 
 //if we can, notify the server that we're going away.
 $(window).unload(function () {
-  jQuery.get("/part", {id: CONFIG.id}, function (data) { }, "json");
+  jQuery.get("/part", {id: CONFIG.id, room: CONFIG.room}, function (data) { }, "json");
 });
