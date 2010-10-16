@@ -217,15 +217,19 @@ function addMessage (from, text, time, _class) {
     messageElement.addClass(_class);
 
   // sanitize
-  text = util.toStaticHTML(text);
+  if (_class != "notice" && _class != "join") {
+    // sanitize
+    text = util.toStaticHTML(text);
+
+    // replace URLs with links
+    text = text.replace(util.urlRE, '<a target="_blank" href="$&">$&</a>');
+  }
 
   // If the current user said this, add a special css class
   var name_re = new RegExp(CONFIG.name);
   if (name_re.exec(text))
     messageElement.addClass("personal");
 
-  // replace URLs with links
-  text = text.replace(util.urlRE, '<a target="_blank" href="$&">$&</a>');
 
   var link;
   if (from.profile != null) {
@@ -435,10 +439,11 @@ function onConnect (session) {
 function outputUsers (names) {
   var names = [];
   for (var i = 0; i < users.length; i++ ) {
-    names.push(users[i].name);
+    var user = users[i];
+    pics.push("<a title='"+user.name+"' target='blank' href='"+user.profile+"'><img src='"+
+        user.pic+"' /></a>");
   }
-  var names_string = names.length > 0 ? names.join(", ") : "(none)";
-  addMessage({name:"users:"}, names_string, new Date(), "notice");
+  addMessage({name:"users:"}, pics, new Date(), "notice");
   return false;
 }
 
