@@ -457,11 +457,11 @@ $(document).ready(function() {
     }
 
     //more validations
-    if (/[^\w\W_\-^!]/.exec(nick)) {
+    /*if (/[^\w_\-^!]/.exec(nick)) {
       alert("Bad character in nick. Can only have letters, numbers, and '_', '-', '^', '!'");
       showConnect();
       return false;
-    }
+    }*/
 
     //make the actual join request to the server
     $.ajax({ cache: false
