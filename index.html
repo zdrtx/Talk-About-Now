@@ -85,6 +85,8 @@
 			var mincount = 0;
 			var maxcount = 0;
 			var roomcount = 0;
+			if (chats == null)
+				return;
 			for(c in chats.rooms)
 			{
 				roomcount++;
@@ -98,7 +100,7 @@
 			for(c in chats.rooms)
 			{
 				var textsize =  Math.ceil((18*(roomcount - mincount))/(maxcount - mincount));
-				var link = "<a class='joinChat' style='font-size:"+textsize+";' href='"+c+"'>"+chats.rooms[c].title+"</a>";
+				var link = "<a class='joinChat' style='font-size:"+textsize+"px;' href='"+c+"'>"+chats.rooms[c].title+"</a>";
 			  //var l = document.createElement("a");
 			  //l.setAttribute('href', c);
 			  //l.innerHTML = chats.rooms[c].title;
@@ -108,6 +110,13 @@
 		}
 	
 		$(document).ready(function(){
+			$("#createChat").focus(function(){
+				$(this).val("").removeClass("faded");
+			}).blur(function(){
+				if($(this).val() == "")
+					$(this).val("Create a new chat group").addClass("faded");
+			});
+								   
 			$.ajax({ cache: false
            , type: "GET" // XXX should be POST
            , dataType: "json"
