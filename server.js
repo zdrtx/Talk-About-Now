@@ -94,14 +94,14 @@ function createRoom(newRoom) //title, creator)
 
 function createSession (user) {
 
-  console.log('weeee');
-  console.log(user.room);
-  console.log(rooms[user.room]);
-   if(rooms[user.room] == null)
-	return null;
+   if(rooms[user.room] == null) {
+	    return null;
+   }
   for (var i in rooms[user.room].sessions) {
     var session = rooms[user.room].sessions[i];
-    if (session && session.id == user.id) return null;
+    if (session && session.id == user.id) {
+      return null;
+    }
   }
 
   var session = { 
@@ -117,8 +117,10 @@ function createSession (user) {
     },
 
     destroy: function () {
-      rooms[user.room].channel.appendMessage(session.name, "part");
-      delete rooms[user.room].sessions[session.id];
+      if (rooms[user.room]) {
+        rooms[user.room].channel.appendMessage(session.name, "part");
+        delete rooms[user.room].sessions[session.id];
+      }
     }
   };
 
@@ -149,10 +151,8 @@ fu.get("/jquery-1.2.6.min.js", fu.staticHandler("jquery-1.2.6.min.js"));
 
 fu.get("/getchats", function (req, res) {
   var allChats = {};
-  console.log(rooms);
   for(prop in rooms)
   {
-  console.log(prop);
 	allChats[prop] = rooms[prop];
   }
   res.simpleJSON(200, { rooms: allChats
@@ -175,8 +175,6 @@ fu.get("/who", function (req, res) {
 
 fu.get("/join", function (req, res) {
 	var user = qs.parse(url.parse(req.url).query);
-  console.log('hihihihi');
-  console.log(user);
   if (user.id == null) {
     res.simpleJSON(400, {error: "Bad login."});
     return;
@@ -189,8 +187,12 @@ fu.get("/join", function (req, res) {
 
   //sys.puts("connection: " + name + "@" + res.connection.remoteAddress);
 
-  rooms[session.room].channel.appendMessage(session.name, "join");
+  if (rooms[session.room]) {
+    rooms[session.room].population++;
+    rooms[session.room].channel.appendMessage(session.name, "join");
+  }
   res.simpleJSON(200, { id: user.id
+                      , room: session.room
                       , name: user.name
                       , rss: mem.rss
                       , starttime: starttime
@@ -216,7 +218,9 @@ fu.get("/create", function (req, res) {
   }
 
 	
-  rooms[session.room].channel.appendMessage(session.name, "join");
+  if (rooms[session.room]) {
+    rooms[session.room].channel.appendMessage(session.name, "join");
+  }
   res.simpleJSON(200, { id: newroom.id
                       , name: newroom.name
                       , room: newroom.room
@@ -232,7 +236,7 @@ fu.get("/part", function (req, res) {
 
   if (stuff && stuff.room && stuff.id && rooms[stuff.room]) {
     session = rooms[stuff.room].sessions[stuff.id];
-	 if(!(rooms[stuff.room].population--))
+	 if(!(--rooms[stuff.room].population))
 	 {
 		delete rooms[stuff.room];
 	 }
@@ -252,10 +256,6 @@ fu.get("/recv", function (req, res) {
   }
   var id = qs.parse(url.parse(req.url).query).id;
   var session;
-  console.log('oh hai');
-  console.log(thing);
-  console.log(thing.room);
-  console.log(rooms[thing.room]);
   if (id && thing.room && rooms[thing.room] && rooms[thing.room].sessions[id]) {
     session = rooms[thing.room].sessions[id];
     session.poke();
@@ -274,10 +274,6 @@ fu.get("/send", function (req, res) {
   var text = qs.parse(url.parse(req.url).query).text;
   var room = qs.parse(url.parse(req.url).query).room;
 
-  console.log('sending');
-  console.log(id);
-  console.log(text);
-  console.log(room);
 
   var session = rooms[room].sessions[id];
   if (!session || !text) {
@@ -287,7 +283,9 @@ fu.get("/send", function (req, res) {
 
   session.poke();
 
-  rooms[session.room].channel.appendMessage(session.name, "msg", text, session.profile);
+  if (rooms[session.room]) {
+    rooms[session.room].channel.appendMessage(session.name, "msg", text, session.profile);
+  }
   res.simpleJSON(200, { rss: mem.rss });
 });
 

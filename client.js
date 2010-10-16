@@ -314,8 +314,6 @@ function longPoll (data) {
     }
   }
 
-  console.log('doing it big');
-  console.log(CONFIG.room);
   //make another request
   //TODO: make it for the correct server
   $.ajax({ cache: false
@@ -394,7 +392,6 @@ var rss;
 
 //handle the server's response to our nickname and join request
 function onConnect (session) {
-  console.log('onConnect');
   if (session.error) {
     alert("error connecting: " + session.error);
     showConnect();
@@ -409,8 +406,6 @@ function onConnect (session) {
   updateRSS();
   updateUptime();
   
-  console.log('you know it');
-  console.log(CONFIG.room);
 
   //update the UI to show the chat
   showChat(CONFIG.name);
@@ -447,6 +442,21 @@ function who () {
 
 $(document).ready(function() {
 						   
+  //Create a new chat with the specified value
+  $("#leave").click(function(){
+    	$.ajax({ cache: false
+           , type: "GET" // XXX should be POST
+           , dataType: "json"
+           , url: "/part"
+           , data: { id: CONFIG.id, room: CONFIG.room }
+           , error: function () {
+               alert("error creating chat");
+               showConnect();
+             }
+           , success: showConnect
+           });				  
+	});
+
   //Create a new chat with the specified value
   $("#create").click(function(){
 		showLoad();
