@@ -4,11 +4,41 @@
     <script src="jquery-1.2.6.min.js" type="text/javascript"></script>
     <script src="client.js" type="text/javascript"></script>
     <script type="text/javascript">
-      function onLogin (name) {
-        document.getElementById('name').innerHTML =
-          'Your name is ' + name;
-        $("#fbConnect").hide();
-      }
+      function onLogin (name){
+    //lock the UI while waiting for a response
+    showLoad();
+    var nick = name;
+
+    //dont bother the backend if we fail easy validations
+    if (nick.length > 50) {
+      alert("Nick too long. 50 character max.");
+      showConnect();
+      return false;
+    }
+
+    //more validations
+    if (/[^\w_\-^!]/.exec(nick)) {
+      alert("Bad character in nick. Can only have letters, numbers, and '_', '-', '^', '!'");
+      showConnect();
+      return false;
+    }
+
+    //make the actual join request to the server
+    $.ajax({ cache: false
+           , type: "GET" // XXX should be POST
+           , dataType: "json"
+           , url: "/join"
+           , data: { nick: nick }
+           , error: function () {
+               alert("error connecting to server");
+               showConnect();
+             }
+           , success: onConnect
+           });
+    return false;
+  }
+	  
+	  
     </script>
     <title>node chat</title>
   </head>
@@ -47,12 +77,12 @@
       window.fbAsyncInit = function() {
         FB.init({appId: '165425556817740', status: true, cookie: true,
                  xfbml: true});
-        FB.api('/me', function(response) {
-          onLogin(response.name);
-        });
+        
         FB.Event.subscribe('auth.login', function(response) {
           // do something with response.session
-          alert("boom");
+          	FB.api('/me', function(response) {
+          		onLogin(response.name);
+        	});
         });
       };
       (function() {
