@@ -32,8 +32,8 @@ function createRoom(newRoom) //title, creator)
   var messages = [],
       callbacks = [];
 
-  this.appendMessage = function (name, type, text) {
-    var m = { name: name
+  this.appendMessage = function (user, type, text) {
+    var m = { user: user
             , type: type // "msg", "join", "part"
             , text: text
             , timestamp: (new Date()).getTime()
@@ -41,13 +41,13 @@ function createRoom(newRoom) //title, creator)
 
     switch (type) {
       case "msg":
-        sys.puts("<" + name + "> " + text);
+        sys.puts("<" + user.name + "> " + text);
         break;
       case "join":
-        sys.puts(name + " join");
+        sys.puts(user.name + " join");
         break;
       case "part":
-        sys.puts(name + " part");
+        sys.puts(user.name + " part");
         break;
     }
 
@@ -117,8 +117,10 @@ function createSession (user) {
     },
 
     destroy: function () {
-      if (rooms[user.room]) {
-        rooms[user.room].channel.appendMessage(session.name, "part");
+      if (rooms[session.room]) {
+        var user = {id: session.id, name: session.name, profile: session.profile,
+          pic: session.pic};
+        rooms[user.room].channel.appendMessage(user, "part");
         delete rooms[user.room].sessions[session.id];
       }
     }
@@ -188,8 +190,10 @@ fu.get("/join", function (req, res) {
   //sys.puts("connection: " + name + "@" + res.connection.remoteAddress);
 
   if (rooms[session.room]) {
+    var user = {id: session.id, name: session.name, profile: session.profile,
+      pic: session.pic};
     rooms[session.room].population++;
-    rooms[session.room].channel.appendMessage(session.name, "join");
+    rooms[session.room].channel.appendMessage(user, "join");
   }
   res.simpleJSON(200, { id: user.id
                       , room: session.room
@@ -219,7 +223,9 @@ fu.get("/create", function (req, res) {
 
 	
   if (rooms[session.room]) {
-    rooms[session.room].channel.appendMessage(session.name, "join");
+    var user = {id: session.id, name: session.name, profile: session.profile,
+      pic: session.pic};
+    rooms[session.room].channel.appendMessage(user, "join");
   }
   res.simpleJSON(200, { id: newroom.id
                       , name: newroom.name
@@ -283,8 +289,11 @@ fu.get("/send", function (req, res) {
 
   session.poke();
 
+  console.log(session);
   if (rooms[session.room]) {
-    rooms[session.room].channel.appendMessage(session.name, "msg", text, session.profile);
+    var user = {id: session.id, name: session.name, profile: session.profile, 
+      pic: session.pic};
+    rooms[session.room].channel.appendMessage(user, "msg", text, session.timestamp);
   }
   res.simpleJSON(200, { rss: mem.rss });
 });
