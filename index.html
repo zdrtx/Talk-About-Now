@@ -65,7 +65,6 @@
         
 		FB.getLoginStatus(function(response) {
 		if (response.session) {
-      console.log(response);
 			// logged in and connected user, someone you know
 			FB.api('/me', function(response) {
         CONFIG.name = response.name;
