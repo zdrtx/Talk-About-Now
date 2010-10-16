@@ -457,7 +457,7 @@ $(document).ready(function() {
     }
 
     //more validations
-    if (/[^_\-^!]/.exec(nick)) {
+    if (/[^\w\W_\-^!]/.exec(nick)) {
       alert("Bad character in nick. Can only have letters, numbers, and '_', '-', '^', '!'");
       showConnect();
       return false;
