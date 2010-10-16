@@ -46,19 +46,48 @@
 		padding:20px;
 	  }
     </style>
+	<script type='text/javascript'>
+
+	function $_GET(q,s) {
+		s = (s) ? s : window.location.search;
+		var re = new RegExp('&amp;'+q+'=([^&amp;]*)','i');
+		return (s=s.replace(/^\?/,'&amp;').match(re)) ?s=s[1] :s='';
+	}
+
+	</script>
+	
 	<script type="text/javascript">
-		function updateChats(chats){
-			if(chats)
+		function loginComplete(){
+			var chat = $_GET('c');
+			if(chat)
 			{
-				for(c in chats.rooms)
-				{
-					//var link = "<a class='joinChat' href='"+c+"'>"+chats.rooms[c].title+"</a>";
-				  var l = document.createElement("a");
-				  l.setAttribute('href', c);
-				  l.innerHTML = chats.rooms[c].title;
-			l.className = 'joinChat';
-				  $("#currentChats").append(l);
-				}
+				$.ajax({ cache: false
+           , type: "GET" // XXX should be POST
+           , dataType: "json"
+           , url: "/join"
+           , data: { room: chat, id: CONFIG.id, name: CONFIG.name, profile: CONFIG.url, pic: CONFIG.pic}
+           , error: function () {
+               alert("error creating chat");
+               showConnect();
+             }
+           , success: onConnect
+           });
+			}
+			else
+			{
+				$("#newChatForm").slideDown();
+			}
+		}
+	
+		function updateChats(chats){
+			for(c in chats.rooms)
+			{
+				//var link = "<a class='joinChat' href='"+c+"'>"+chats.rooms[c].title+"</a>";
+			  var l = document.createElement("a");
+			  l.setAttribute('href', c);
+			  l.innerHTML = chats.rooms[c].title;
+        l.className = 'joinChat';
+			  $("#currentChats").append(l);
 			}
 		}
 	
@@ -73,7 +102,7 @@
                showConnect();
              }
            , success: updateChats
-           });	
+           });		
 		});
 	</script>
   </head>
@@ -87,12 +116,13 @@
             <p>
               Create a Chat</p>
             <input id="createChat">
-            <input name="createChat" type="button" id="create" value="Create">
+            <input name="createChat" type="button" id="create" action="submit" value="Create">
           </fieldset>
-        </form>
-		<div id="currentChats">
+		  <div id="currentChats">
 			
 		</div>
+        </form>
+		
       </div>
       <div id="loading"><p>loading</p></div>
       <div id="log"></div>
@@ -121,7 +151,7 @@
         CONFIG.pic =
         'https://graph.facebook.com/'+CONFIG.id+'/picture?access_token='+
           encodeURIComponent(response.session.access_token);
-//        onLogin();
+		loginComplete();
       });
               
 		} else {
@@ -132,7 +162,7 @@
         FB.Event.subscribe('auth.login', function(response) {
           // do something with response.session
           	FB.api('/me', function(response) {
-//          		onLogin(response.name);
+          		loginComplete();
         	});
         });
       };
