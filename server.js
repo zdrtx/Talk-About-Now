@@ -89,6 +89,7 @@ function createRoom(newRoom) //title, creator)
 	rooms[id].sessions = {};
 	rooms[id].title = newRoom.title;
 	rooms[id].creator = newRoom.creator;
+	rooms[id].priv = newRoom.nolink;
   return id;
 }
 
@@ -97,16 +98,22 @@ function createSession (user) {
    if(rooms[user.room] == null) {
 	    return null;
    }
-  for (var i in rooms[user.room].sessions) {
-    var session = rooms[user.room].sessions[i];
-    if (session && session.id == user.id) {
-      return null;
+   if(rooms[user.room].sessions)
+   {
+	  for (var i in rooms[user.room].sessions) {
+		var session = rooms[user.room].sessions[i];
+		if (session && session.id == user.id) {
+		  return session;
+		}
+	  }
     }
-  }
 
-  var session = { 
-title: rooms[user.room].title,
-    name: user.name, 
+	var session = { 
+	if(rooms[user.room])
+	{
+		title: rooms[user.room].title,
+	}
+	name: user.name, 
     id: user.id,
 	profile: user.profile,
 	pic: user.pic,
@@ -122,12 +129,16 @@ title: rooms[user.room].title,
         var user = {id: session.id, name: session.name, profile: session.profile,
           pic: session.pic};
         rooms[session.room].channel.appendMessage(user, "part");
-        delete rooms[session.room].sessions[session.id];
+		if(rooms[session.room].sessions[session.id])
+		{
+			delete rooms[session.room].sessions[session.id];
+		}
       }
     }
   };
 
-  rooms[user.room].sessions[session.id] = session;
+  if(rooms[user.room].sessions)
+	rooms[user.room].sessions[session.id] = session;
   return session;
 }
 
@@ -158,7 +169,8 @@ fu.get("/getchats", function (req, res) {
   var allChats = {};
   for(prop in rooms)
   {
-  	allChats[prop] = rooms[prop];
+	if(!allChats[prop].priv)
+		allChats[prop] = rooms[prop];
   }
   res.simpleJSON(200, {rooms: allChats});
   
@@ -168,10 +180,13 @@ fu.get("/getchats", function (req, res) {
 fu.get("/who", function (req, res) {
   var names = [];
   var roomId = qs.parse(url.parse(req.url).query).room;
-  for (var id in rooms[roomId].sessions) {
-    if (!rooms[roomId].sessions.hasOwnProperty(id)) continue;
-    var session = rooms[roomId].sessions[id];
-    names.push(session.name);
+  if(rooms[roomId].sessions)
+  {
+	  for (var id in rooms[roomId].sessions) {
+		if (!rooms[roomId].sessions.hasOwnProperty(id)) continue;
+		var session = rooms[roomId].sessions[id];
+		names.push(session.name);
+	  }
   }
   res.simpleJSON(200, { names: names
                       , rss: mem.rss
@@ -200,6 +215,7 @@ fu.get("/join", function (req, res) {
   }
   res.simpleJSON(200, { id: user.id
                       , room: session.room
+					  , title: rooms[session.room].title
                       , name: user.name
                       , rss: mem.rss
                       , starttime: starttime
@@ -240,11 +256,10 @@ fu.get("/create", function (req, res) {
 });
 
 
-//todo: deal w this
 fu.get("/part", function (req, res) {
   var stuff = qs.parse(url.parse(req.url).query);
 
-  if (stuff && stuff.room && stuff.id && rooms[stuff.room]) {
+  if (stuff && stuff.room && stuff.id && rooms[stuff.room] && rooms[stuff.room].sessions) {
     session = rooms[stuff.room].sessions[stuff.id];
 	 if(!(--rooms[stuff.room].population))
 	 {
@@ -313,4 +328,3 @@ function randomString() {
 	}
   return randomstring;
 }
-
