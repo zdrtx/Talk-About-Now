@@ -8,6 +8,7 @@
   <body>
     <div id="app">
       <div id="connect">
+<fb:login-button autologoutlink="true"></fb:login-button>
         <form action="#">
           <fieldset> 
             <p>
@@ -185,5 +186,20 @@
         </ul>
         <input tabindex="1" type="text" id="entry"/>
       </div>
+    <div id="fb-root"></div>
+    <script>
+      window.fbAsyncInit = function() {
+        FB.init({appId: '165425556817740', status: true, cookie: true,
+                 xfbml: true});
+      };
+      (function() {
+        var e = document.createElement('script');
+        e.type = 'text/javascript';
+        e.src = document.location.protocol +
+          '//connect.facebook.net/en_US/all.js';
+        e.async = true;
+        document.getElementById('fb-root').appendChild(e);
+      }());
+    </script>
   </body>
 </html>
