@@ -175,6 +175,8 @@ fu.get("/who", function (req, res) {
 
 fu.get("/join", function (req, res) {
 	var user = qs.parse(url.parse(req.url).query);
+  console.log('hihihihi');
+  console.log(user);
   if (user.id == null) {
     res.simpleJSON(400, {error: "Bad login."});
     return;
@@ -271,6 +273,11 @@ fu.get("/send", function (req, res) {
   var id = qs.parse(url.parse(req.url).query).id;
   var text = qs.parse(url.parse(req.url).query).text;
   var room = qs.parse(url.parse(req.url).query).room;
+
+  console.log('sending');
+  console.log(id);
+  console.log(text);
+  console.log(room);
 
   var session = rooms[room].sessions[id];
   if (!session || !text) {

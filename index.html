@@ -11,15 +11,14 @@
 			{
 				//var link = "<a class='joinChat' href='"+c+"'>"+chats.rooms[c].title+"</a>";
 			  var l = document.createElement("a");
-			  link.setAttribute('href', 'mypage.htm');
 			  l.setAttribute('href', c);
 			  l.innerHTML = chats.rooms[c].title;
+        l.className = 'joinChat';
 			  $("#currentChats").append(l);
 			}
 		}
 	
 		$(document).ready(function(){
-        alert('WHOAH');
 			$.ajax({ cache: false
            , type: "GET" // XXX should be POST
            , dataType: "json"

@@ -468,13 +468,13 @@ $(document).ready(function() {
 	  $("a.joinChat").live("click", function(e) {
       e.preventDefault();
 		showLoad();
-		var room = this.attr("href");
+		var rm = $(this).attr("href");
 
     	$.ajax({ cache: false
            , type: "GET" // XXX should be POST
            , dataType: "json"
            , url: "/join"
-           , data: { room: CONFIG.id, name: CONFIG.name, profile: CONFIG.url, pic: CONFIG.pic}
+           , data: { room: rm, id: CONFIG.id, name: CONFIG.name, profile: CONFIG.url, pic: CONFIG.pic}
            , error: function () {
                alert("error creating chat");
                showConnect();
