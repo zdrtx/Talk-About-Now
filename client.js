@@ -1,5 +1,6 @@
 var CONFIG = { debug: false
 			 , room: -1
+       , title: "#"
 			 , name: "#"
 			 , url: "#"
 			 , pic: "#"
@@ -115,6 +116,7 @@ function updateUsersLink ( ) {
   var t = users.length.toString() + " user";
   if (users.length != 1) t += "s";
   $("#usersLink").text(t);
+  $("#roomTitle").text(CONFIG.title);
 }
 
 //handles another person joining chat
@@ -136,7 +138,7 @@ function userPart(user, timestamp) {
   addMessage(user, "left", timestamp, "part");
   //remove the user from the list
   for (var i = 0; i < users.length; i++) {
-    if (users[i].id == id) {
+    if (users[i].id == user.id) {
       users.splice(i,1)
       break;
     }
@@ -409,6 +411,7 @@ function onConnect (session) {
     return;
   }
 
+  CONFIG.title = session.title;
   CONFIG.name = session.name;
   CONFIG.id   = session.id;
   CONFIG.room = session.room;
@@ -461,21 +464,18 @@ $(document).ready(function() {
    FB.ui(
    {
      method: 'stream.publish',
-     message: 'I ',
+     message: 'I\'m in the chat room, '+CONFIG.title+'. Come join me!',
      attachment: {
-       name: 'Connect',
-       caption: 'The Facebook Connect JavaScript SDK',
+       name: 'Talk About Now',
+       caption: 'A place to talk about what\'s going on.',
        description: (
-         'A small JavaScript library that allows you to harness ' +
-         'the power of Facebook, bringing the user\'s identity, ' +
-         'social graph and distribution power to your site.'
-       ),
-       href: 'http://github.com/facebook/connect-js'
+       ''),
+       href: 'http://128.62.170.45:8001/?c='+CONFIG.room,
      },
      action_links: [
-       { text: 'Code', href: 'http://github.com/facebook/connect-js' }
+       { text: 'Code', href: 'http://128.62.170.45:8001?c='+CONFIG.room }
      ],
-     user_message_prompt: 'Share your thoughts about Connect'
+     user_message_prompt: 'Invite your friends to come chat with you!'
    },
    function(response) {
      if (response && response.post_id) {

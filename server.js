@@ -105,6 +105,7 @@ function createSession (user) {
   }
 
   var session = { 
+title: rooms[user.room].title,
     name: user.name, 
     id: user.id,
 	profile: user.profile,
@@ -227,6 +228,7 @@ fu.get("/create", function (req, res) {
     rooms[session.room].channel.appendMessage(user, "join");
   }
   res.simpleJSON(200, { id: newroom.id
+                      , title: newroom.title
                       , name: newroom.name
                       , room: newroom.room
                       , rss: mem.rss
@@ -308,3 +310,4 @@ function randomString() {
 	}
   return randomstring;
 }
+
