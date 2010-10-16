@@ -141,6 +141,7 @@ fu.get("/who", function (req, res) {
 });
 
 fu.get("/join", function (req, res) {
+	console.log(url.parse(req.url).query);
 	var user = qs.parse(url.parse(req.url).query);
   
   if (user.id == null) {
