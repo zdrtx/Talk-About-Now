@@ -117,7 +117,6 @@ function updateUsersLink ( ) {
   var t = users.length.toString() + " user";
   if (users.length != 1) t += "s";
   $("#usersLink").text(t);
-  $("#roomTitle").text(CONFIG.title);
 }
 
 //handles another person joining chat
@@ -365,6 +364,8 @@ function send(msg) {
 
 //Transition the page to the state that prompts the user for a nickname
 function showConnect () {
+  $(".message").remove();
+  $("#log").hide();
   $("#connect").show();
   $("#loading").hide();
   $("#toolbar").hide();
@@ -380,6 +381,7 @@ function showLoad () {
 
 //transition the page to the main chat view, putting the cursor in the textfield
 function showChat (nick) {
+  $("#log").show();
   $("#toolbar").show();
   $("#entry").focus();
 
@@ -436,6 +438,8 @@ function onConnect (session) {
     CONFIG.unread = 0;
     updateTitle();
   });
+
+  $("#roomTitle").html(CONFIG.title);
   longPoll();
 }
 
@@ -474,7 +478,7 @@ $(document).ready(function() {
        href: 'http://128.62.170.45:8001/?c='+CONFIG.room,
      },
      action_links: [
-       { text: 'Code', href: 'http://128.62.170.45:8001?c='+CONFIG.room }
+       { text: 'Chat now!', href: 'http://128.62.170.45:8001?c='+CONFIG.room }
      ],
      user_message_prompt: 'Invite your friends to come chat with you!'
    },
@@ -488,7 +492,6 @@ $(document).ready(function() {
  );     
     });
 						   
-  //Create a new chat with the specified value
   $("#leave").click(function(){
     	$.ajax({ cache: false
            , type: "GET" // XXX should be POST
