@@ -121,7 +121,7 @@ function createSession (user) {
 
 // interval to kill off old sessions
 setInterval(function () {
-  var now = new Date();
+  var now = new Date();/*
   for (var id in sessions) {
     if (!sessions.hasOwnProperty(id)) continue;
     var session = sessions[id];
@@ -129,7 +129,7 @@ setInterval(function () {
     if (now - session.timestamp > SESSION_TIMEOUT) {
       session.destroy();
     }
-  }
+  }*/
 }, 1000);
 
 fu.listen(Number(process.env.PORT || PORT), HOST);
