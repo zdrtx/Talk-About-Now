@@ -1,4 +1,5 @@
 var CONFIG = { debug: false
+			 , room: -1
 			 , name: "#"
 			 , url: "#"
 			 , pic: "#"
@@ -319,7 +320,7 @@ function longPoll (data) {
          , type: "GET"
          , url: "/recv"
          , dataType: "json"
-         , data: { since: CONFIG.last_message_time, id: CONFIG.id }
+         , data: { since: CONFIG.last_message_time, id: CONFIG.id, room:CONFIG.room }
          , error: function () {
              addMessage("", "long poll error. trying again...", new Date(), "error");
              transmission_errors += 1;
@@ -344,7 +345,7 @@ function send(msg) {
   if (CONFIG.debug === false) {
     // XXX should be POST
     // XXX should add to messages immediately
-    jQuery.get("/send", {id: CONFIG.id, text: msg}, function (data) { }, "json");
+    jQuery.get("/send", {id: CONFIG.id, text: msg, room:CONFIG.room}, function (data) { }, "json");
   }
 }
 
@@ -399,6 +400,7 @@ function onConnect (session) {
 
   CONFIG.name = session.name;
   CONFIG.id   = session.id;
+  CONFIG.room = session.room;
   starttime   = new Date(session.starttime);
   rss         = session.rss;
   updateRSS();
@@ -429,7 +431,7 @@ function outputUsers () {
 
 //get a list of the users presently in the room, and add it to the stream
 function who () {
-  jQuery.get("/who", {}, function (data, status) {
+  jQuery.get("/who", {CONFIG.room}, function (data, status) {
     if (status != "success") return;
     names = data.names;
     outputUsers();
@@ -437,6 +439,41 @@ function who () {
 }
 
 $(document).ready(function() {
+						   
+  //Create a new chat with the specified value
+  $("#create").click(function(){
+		showLoad();
+		var title = $("#createChat").attr("value");
+    	$.ajax({ cache: false
+           , type: "GET" // XXX should be POST
+           , dataType: "json"
+           , url: "/create"
+           , data: { id: CONFIG.id, name: CONFIG.name, profile: CONFIG.url, pic: CONFIG.pic, title: title}
+           , error: function () {
+               alert("error creating chat");
+               showConnect();
+             }
+           , success: onConnect
+           });				  
+	});
+	
+	//Connect to an existing chat
+	  $(".joinChat").click(function(){
+		showLoad();
+		var room = this.attr("src");
+
+    	$.ajax({ cache: false
+           , type: "GET" // XXX should be POST
+           , dataType: "json"
+           , url: "/join"
+           , data: { room: room: CONFIG.id, name: CONFIG.name, profile: CONFIG.url, pic: CONFIG.pic}
+           , error: function () {
+               alert("error creating chat");
+               showConnect();
+             }
+           , success: onConnect
+           });				  
+	});
 
   //submit new messages when the user hits enter if the message isnt blank
   $("#entry").keypress(function (e) {

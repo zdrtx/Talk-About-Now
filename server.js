@@ -10,6 +10,8 @@ setInterval(function () {
   mem = process.memoryUsage();
 }, 10*1000);
 
+var rooms = {};
+
 
 var fu = require("./fu"),
     sys = require("sys"),
@@ -19,7 +21,11 @@ var fu = require("./fu"),
 var MESSAGE_BACKLOG = 200,
     SESSION_TIMEOUT = 60 * 1000;
 
-var channel = new function () {
+	
+function createRoom(newRoom) //title, creator)
+{
+	var id = randomString();
+	rooms[id].channel =new function () {
   var messages = [],
       callbacks = [];
 
@@ -78,13 +84,18 @@ var channel = new function () {
     }
   }, 3000);
 };
-
-var sessions = {};
+	rooms[id].sessions = {};
+	rooms[id].title = newRoom.title;
+	rooms[id].creator = newRoom.creator;
+	rooms
+}
 
 function createSession (user) {
 
-  for (var i in sessions) {
-    var session = sessions[i];
+   if(rooms[user.room] == null)
+	return null;
+  for (var i in rooms[user.room]sessions) {
+    var session = rooms[user.room]sessions[i];
     if (session && session.id == user.id) return null;
   }
 
@@ -93,6 +104,7 @@ function createSession (user) {
     id: user.id,
 	profile: user.profile,
 	pic: user.pic,
+	room: user.room,
     timestamp: new Date(),
 
     poke: function () {
@@ -101,11 +113,11 @@ function createSession (user) {
 
     destroy: function () {
       channel.appendMessage(session.name, "part");
-      delete sessions[session.id];
+      delete rooms[user.room]sessions[session.id];
     }
   };
 
-  sessions[session.id] = session;
+  rooms[user.room]sessions[session.id] = session;
   return session;
 }
 
@@ -132,9 +144,10 @@ fu.get("/jquery-1.2.6.min.js", fu.staticHandler("jquery-1.2.6.min.js"));
 
 fu.get("/who", function (req, res) {
   var names = [];
-  for (var id in sessions) {
-    if (!sessions.hasOwnProperty(id)) continue;
-    var session = sessions[id];
+  var roomId = qs.parse(url.parse(req.url).query).room;
+  for (var id in rooms[roomId]sessions) {
+    if (!rooms[roomId]sessions.hasOwnProperty(id)) continue;
+    var session = rooms[roomId]sessions[id];
     names.push(session.name);
   }
   res.simpleJSON(200, { names: names
@@ -157,7 +170,7 @@ fu.get("/join", function (req, res) {
 
   //sys.puts("connection: " + name + "@" + res.connection.remoteAddress);
 
-  channel.appendMessage(session.name, "join");
+  rooms[session.room]channel.appendMessage(session.name, "join");
   res.simpleJSON(200, { id: user.id
                       , name: user.name
                       , rss: mem.rss
@@ -165,6 +178,36 @@ fu.get("/join", function (req, res) {
                       });
 });
 
+
+
+fu.get("/create", function (req, res) {
+	
+	var newroom = qs.parse(url.parse(req.url).query);
+	
+  if (newroom.id == null) {
+    res.simpleJSON(400, {error: "Bad login."});
+    return;
+  }
+  createRoom({newroom.title, newroom.name});
+  var session = createSession(newroom);
+  console.log(session);
+  if (session == null) {
+    res.simpleJSON(400, {error: "Already logged in?"});
+    return;
+  }
+
+  //sys.puts("connection: " + name + "@" + res.connection.remoteAddress);
+
+  rooms[session.room]channel.appendMessage(session.name, "join");
+  res.simpleJSON(200, { id: user.id
+                      , name: user.name
+                      , rss: mem.rss
+                      , starttime: starttime
+                      });
+});
+
+
+//todo: deal w this
 fu.get("/part", function (req, res) {
   var id = qs.parse(url.parse(req.url).query).id;
 
@@ -175,14 +218,16 @@ fu.get("/part", function (req, res) {
   res.simpleJSON(200, { rss: mem.rss });
 });
 
+
 fu.get("/recv", function (req, res) {
-  if (!qs.parse(url.parse(req.url).query).since) {
+	var thing = qs.parse(url.parse(req.url).query);
+  if (!thing.since) {
     res.simpleJSON(400, { error: "Must supply since parameter" });
     return;
   }
   var id = qs.parse(url.parse(req.url).query).id;
   var session;
-  if (id && sessions[id]) {
+  if (id && rooms[thing.roomId]sessions[id]) {
     session = sessions[id];
     session.poke();
   }
@@ -198,8 +243,9 @@ fu.get("/recv", function (req, res) {
 fu.get("/send", function (req, res) {
   var id = qs.parse(url.parse(req.url).query).id;
   var text = qs.parse(url.parse(req.url).query).text;
+  var room = qs.parse(url.parse(req.url).query).room;
 
-  var session = sessions[id];
+  var session = rooms[session.room]sessions[id];
   if (!session || !text) {
     res.simpleJSON(400, { error: "No such session id" });
     return;
@@ -207,6 +253,18 @@ fu.get("/send", function (req, res) {
 
   session.poke();
 
-  channel.appendMessage(session.name, "msg", text, session.profile);
+  rooms[session.room]channel.appendMessage(session.name, "msg", text, session.profile);
   res.simpleJSON(200, { rss: mem.rss });
 });
+
+
+function randomString() {
+	var chars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXTZabcdefghiklmnopqrstuvwxyz";
+	var string_length = 8;
+	var randomstring = '';
+	for (var i=0; i<string_length; i++) {
+		var rnum = Math.floor(Math.random() * chars.length);
+		randomstring += chars.substring(rnum,rnum+1);
+	}
+	document.randform.randomfield.value = randomstring;
+}
