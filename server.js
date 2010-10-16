@@ -109,10 +109,7 @@ function createSession (user) {
     }
 
 	var session = { 
-	if(rooms[user.room])
-	{
-		title: rooms[user.room].title,
-	}
+	title: (rooms[user.room]) ? rooms[user.room].title : "Chat",
 	name: user.name, 
     id: user.id,
 	profile: user.profile,
