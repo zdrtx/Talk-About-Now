@@ -9,7 +9,7 @@ var CONFIG = { debug: false
              , unread: 0 //updated in the message-processing loop
              };
 
-var names = [];
+var uids = [];
 
 //  CUT  ///////////////////////////////////////////////////////////////////
 /* This license and copyright apply to all code until the next "CUT"
@@ -112,32 +112,32 @@ Date.fromString = function(str) {
 
 //updates the users link to reflect the number of active users
 function updateUsersLink ( ) {
-  var t = names.length.toString() + " user";
-  if (names.length != 1) t += "s";
+  var t = uids.length.toString() + " user";
+  if (uids.length != 1) t += "s";
   $("#usersLink").text(t);
 }
 
 //handles another person joining chat
-function userJoin(name, timestamp) {
+function userJoin(user, timestamp) {
   //put it in the stream
-  addMessage(name, "joined", timestamp, "join");
+  addMessage(user, "joined", timestamp, "join");
   //if we already know about this user, ignore it
-  for (var i = 0; i < names.length; i++)
-    if (names[i] == name) return;
+  for (var i = 0; i < uids.length; i++)
+    if (uids[i] == user.id) return;
   //otherwise, add the user to the list
-  names.push(name);
+  uids.push(user.id);
   //update the UI
   updateUsersLink();
 }
 
 //handles someone leaving
-function userPart(name, timestamp) {
+function userPart(user, timestamp) {
   //put it in the stream
-  addMessage(name, "left", timestamp, "part");
+  addMessage(user, "left", timestamp, "part");
   //remove the user from the list
-  for (var i = 0; i < names.length; i++) {
-    if (names[i] ==name) {
-      names.splice(i,1)
+  for (var i = 0; i < uids.length; i++) {
+    if (uids[i] == id) {
+      uids.splice(i,1)
       break;
     }
   }
@@ -227,9 +227,16 @@ function addMessage (from, text, time, _class) {
   // replace URLs with links
   text = text.replace(util.urlRE, '<a target="_blank" href="$&">$&</a>');
 
+  var link;
+  if (from.profile != null) {
+    link = "<a target='blank' href='"+from.profile+"'>"+util.toStaticHTML(from.name)+"</a>";
+  } else {
+    link = util.toStaticHTML(from.name);
+  }
+
   var content = '<tr>'
               + '  <td class="date">' + util.timeString(time) + '</td>'
-              + '  <td class="nick">' + util.toStaticHTML(from) + '</td>'
+              + '  <td class="nick">' + link + '</td>'
               + '  <td class="msg-text">' + text  + '</td>'
               + '</tr>'
               ;
@@ -292,15 +299,15 @@ function longPoll (data) {
           if(!CONFIG.focus){
             CONFIG.unread++;
           }
-          addMessage(message.name, message.text, message.timestamp);
+          addMessage(message.user, message.text, message.timestamp);
           break;
 
         case "join":
-          userJoin(message.name, message.timestamp);
+          userJoin(message.user, message.timestamp);
           break;
 
         case "part":
-          userPart(message.name, message.timestamp);
+          userPart(message.user, message.timestamp);
           break;
       }
     }
@@ -425,9 +432,9 @@ function onConnect (session) {
 }
 
 //add a list of present chat members to the stream
-function outputUsers () {
+function outputUsers (names) {
   var names_string = names.length > 0 ? names.join(", ") : "(none)";
-  addMessage("users:", names_string, new Date(), "notice");
+  addMessage({name:"users:"}, names_string, new Date(), "notice");
   return false;
 }
 
@@ -435,8 +442,7 @@ function outputUsers () {
 function who () {
   jQuery.get("/who", {room: CONFIG.room}, function (data, status) {
     if (status != "success") return;
-    names = data.names;
-    outputUsers();
+    outputUsers(data.names);
   }, "json");
 }
 
