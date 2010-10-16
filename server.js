@@ -181,12 +181,13 @@ fu.get("/join", function (req, res) {
 fu.get("/create", function (req, res) {
 	
 	var newroom = qs.parse(url.parse(req.url).query);
+	var title = newroom.title;
 	
   if (newroom.id == null) {
     res.simpleJSON(400, {error: "Bad login."});
     return;
   }
-  createRoom({newroom.title, newroom.name});
+  createRoom({title: newroom.title, name: newroom.name});
   var session = createSession(newroom);
   console.log(session);
   if (session == null) {
