@@ -120,8 +120,8 @@ function createSession (user) {
       if (rooms[session.room]) {
         var user = {id: session.id, name: session.name, profile: session.profile,
           pic: session.pic};
-        rooms[user.room].channel.appendMessage(user, "part");
-        delete rooms[user.room].sessions[session.id];
+        rooms[session.room].channel.appendMessage(user, "part");
+        delete rooms[session.room].sessions[session.id];
       }
     }
   };
