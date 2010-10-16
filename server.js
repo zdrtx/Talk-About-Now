@@ -25,7 +25,10 @@ var MESSAGE_BACKLOG = 200,
 function createRoom(newRoom) //title, creator)
 {
 	var id = randomString();
-	rooms[id].channel =new function () {
+  rooms[id] = {};
+  console.log('lololol');
+  console.log(rooms[id]);
+	rooms[id].channel = new function () {
   var messages = [],
       callbacks = [];
 
@@ -82,14 +85,18 @@ function createRoom(newRoom) //title, creator)
     }
   }, 3000);
 };
+  
 	rooms[id].sessions = {};
 	rooms[id].title = newRoom.title;
 	rooms[id].creator = newRoom.creator;
-	rooms
+  return id;
 }
 
 function createSession (user) {
 
+  console.log('weeee');
+  console.log(user.room);
+  console.log(rooms[user.room]);
    if(rooms[user.room] == null)
 	return null;
   for (var i in rooms[user.room].sessions) {
@@ -114,6 +121,9 @@ function createSession (user) {
       delete rooms[user.room].sessions[session.id];
     }
   };
+
+  console.log('boom');
+  console.log(session.room);
 
   rooms[user.room].sessions[session.id] = session;
   return session;
@@ -160,6 +170,7 @@ fu.get("/join", function (req, res) {
     return;
   }
   var session = createSession(user);
+  console.log('OMG');
   console.log(session);
   if (session == null) {
     res.simpleJSON(400, {error: "Already logged in?"});
@@ -187,8 +198,12 @@ fu.get("/create", function (req, res) {
     res.simpleJSON(400, {error: "Bad login."});
     return;
   }
-  createRoom({title: newroom.title, name: newroom.name});
+  var roomId = createRoom({title: newroom.title, name: newroom.name});
+  newroom.room = roomId;
+  console.log('YESYESYES');
+  console.log(newroom);
   var session = createSession(newroom);
+  console.log('roller');
   console.log(session);
   if (session == null) {
     res.simpleJSON(400, {error: "Already logged in?"});
@@ -198,11 +213,12 @@ fu.get("/create", function (req, res) {
   //sys.puts("connection: " + name + "@" + res.connection.remoteAddress);
 
   rooms[session.room].channel.appendMessage(session.name, "join");
-  res.simpleJSON(200, { id: user.id
-                      , name: user.name
-                      , rss: mem.rss
+  console.log('bambam');
+  res.simpleJSON(200, { id: newroom.id
+                      , name: newroom.name
                       , starttime: starttime
                       });
+  console.log('never will happen');
 });
 
 
@@ -226,7 +242,10 @@ fu.get("/recv", function (req, res) {
   }
   var id = qs.parse(url.parse(req.url).query).id;
   var session;
-  if (id && rooms[thing.roomId].sessions[id]) {
+  console.log('oh hai');
+  console.log(thing);
+  console.log(thing.room);
+  if (id && rooms[thing.room].sessions[id]) {
     session = sessions[id];
     session.poke();
   }
@@ -265,5 +284,5 @@ function randomString() {
 		var rnum = Math.floor(Math.random() * chars.length);
 		randomstring += chars.substring(rnum,rnum+1);
 	}
-	document.randform.randomfield.value = randomstring;
+  return randomstring;
 }

@@ -314,6 +314,8 @@ function longPoll (data) {
     }
   }
 
+  console.log('doing it big');
+  console.log(CONFIG.room);
   //make another request
   //TODO: make it for the correct server
   $.ajax({ cache: false
@@ -392,11 +394,14 @@ var rss;
 
 //handle the server's response to our nickname and join request
 function onConnect (session) {
+  console.log('onConnect');
   if (session.error) {
     alert("error connecting: " + session.error);
     showConnect();
     return;
   }
+
+  longPoll();
 
   CONFIG.name = session.name;
   CONFIG.id   = session.id;
@@ -405,6 +410,9 @@ function onConnect (session) {
   rss         = session.rss;
   updateRSS();
   updateUptime();
+  
+  console.log('you know it');
+  console.log(CONFIG.room);
 
   //update the UI to show the chat
   showChat(CONFIG.name);
@@ -431,7 +439,7 @@ function outputUsers () {
 
 //get a list of the users presently in the room, and add it to the stream
 function who () {
-  jQuery.get("/who", {CONFIG.room}, function (data, status) {
+  jQuery.get("/who", {room: CONFIG.room}, function (data, status) {
     if (status != "success") return;
     names = data.names;
     outputUsers();
@@ -466,7 +474,7 @@ $(document).ready(function() {
            , type: "GET" // XXX should be POST
            , dataType: "json"
            , url: "/join"
-           , data: { room: room: CONFIG.id, name: CONFIG.name, profile: CONFIG.url, pic: CONFIG.pic}
+           , data: { room: CONFIG.id, name: CONFIG.name, profile: CONFIG.url, pic: CONFIG.pic}
            , error: function () {
                alert("error creating chat");
                showConnect();
@@ -503,7 +511,7 @@ $(document).ready(function() {
   //begin listening for updates right away
   //interestingly, we don't need to join a room to get its updates
   //we just don't show the chat stream to the user until we create a session
-  longPoll();
+  //longPoll();
 
   showConnect();
 });

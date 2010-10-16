@@ -68,7 +68,7 @@
         CONFIG.pic =
         'https://graph.facebook.com/'+CONFIG.id+'/picture?access_token='+
           encodeURIComponent(response.session.access_token);
-        onLogin();
+//        onLogin();
       });
               
 		} else {
@@ -79,7 +79,7 @@
         FB.Event.subscribe('auth.login', function(response) {
           // do something with response.session
           	FB.api('/me', function(response) {
-          		onLogin(response.name);
+//          		onLogin(response.name);
         	});
         });
       };
