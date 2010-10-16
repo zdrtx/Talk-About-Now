@@ -31,8 +31,6 @@ function createRoom(newRoom) //title, creator)
 	rooms[id].channel = new function () {
   var messages = [],
       callbacks = [];
-	  
-   updateChatListListeners();
 
   this.appendMessage = function (user, type, text) {
     var m = { user: user
@@ -157,13 +155,7 @@ var chatListUpdateRequests [];
 
 fu.get("/getchats", function (req, res) {
 
-	chatListUpdateRequests.push(res);
-  
-});
-
-updateChatListListeners()
-{
-  var allChats = {};
+	var allChats = {};
   for(prop in rooms)
   {
 	allChats[prop] = rooms[prop];
@@ -173,8 +165,8 @@ updateChatListListeners()
 		response.simpleJSON(200, { rooms: allChats
         };
 	}
-}
-
+  
+});
 
 fu.get("/who", function (req, res) {
   var names = [];
@@ -258,7 +250,6 @@ fu.get("/part", function (req, res) {
     session = rooms[stuff.room].sessions[stuff.id];
 	 if(!(--rooms[stuff.room].population))
 	 {
-		updateChatListListeners();
 		delete rooms[stuff.room];
 	 }
     session.destroy();
