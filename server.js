@@ -27,8 +27,6 @@ var channel = new function () {
     var m = { name: name
             , type: type // "msg", "join", "part"
             , text: text
-            , profile: profile
-            , pic: pic
             , timestamp: (new Date()).getTime()
             };
 
