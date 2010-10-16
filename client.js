@@ -1,12 +1,14 @@
 var CONFIG = { debug: false
-             , nick: "#"   // set in onConnect
+			 , name: "#"
+			 , url: "#"
+			 , pic: "#"
              , id: null    // set in onConnect
              , last_message_time: 1
              , focus: true //event listeners bound in onConnect
              , unread: 0 //updated in the message-processing loop
              };
 
-var nicks = [];
+var names = [];
 
 //  CUT  ///////////////////////////////////////////////////////////////////
 /* This license and copyright apply to all code until the next "CUT"
@@ -109,32 +111,32 @@ Date.fromString = function(str) {
 
 //updates the users link to reflect the number of active users
 function updateUsersLink ( ) {
-  var t = nicks.length.toString() + " user";
-  if (nicks.length != 1) t += "s";
+  var t = names.length.toString() + " user";
+  if (names.length != 1) t += "s";
   $("#usersLink").text(t);
 }
 
 //handles another person joining chat
-function userJoin(nick, timestamp) {
+function userJoin(name, timestamp) {
   //put it in the stream
-  addMessage(nick, "joined", timestamp, "join");
+  addMessage(name, "joined", timestamp, "join");
   //if we already know about this user, ignore it
-  for (var i = 0; i < nicks.length; i++)
-    if (nicks[i] == nick) return;
+  for (var i = 0; i < names.length; i++)
+    if (names[i] == name) return;
   //otherwise, add the user to the list
-  nicks.push(nick);
+  names.push(name);
   //update the UI
   updateUsersLink();
 }
 
 //handles someone leaving
-function userPart(nick, timestamp) {
+function userPart(name, timestamp) {
   //put it in the stream
-  addMessage(nick, "left", timestamp, "part");
+  addMessage(name, "left", timestamp, "part");
   //remove the user from the list
-  for (var i = 0; i < nicks.length; i++) {
-    if (nicks[i] == nick) {
-      nicks.splice(i,1)
+  for (var i = 0; i < names.length; i++) {
+    if (names[i] ==name) {
+      names.splice(i,1)
       break;
     }
   }
@@ -217,8 +219,8 @@ function addMessage (from, text, time, _class) {
   text = util.toStaticHTML(text);
 
   // If the current user said this, add a special css class
-  var nick_re = new RegExp(CONFIG.nick);
-  if (nick_re.exec(text))
+  var name_re = new RegExp(CONFIG.name);
+  if (name_re.exec(text))
     messageElement.addClass("personal");
 
   // replace URLs with links
@@ -289,15 +291,15 @@ function longPoll (data) {
           if(!CONFIG.focus){
             CONFIG.unread++;
           }
-          addMessage(message.nick, message.text, message.timestamp);
+          addMessage(message.name, message.text, message.timestamp);
           break;
 
         case "join":
-          userJoin(message.nick, message.timestamp);
+          userJoin(message.name, message.timestamp);
           break;
 
         case "part":
-          userPart(message.nick, message.timestamp);
+          userPart(message.name, message.timestamp);
           break;
       }
     }
@@ -312,6 +314,7 @@ function longPoll (data) {
   }
 
   //make another request
+  //TODO: make it for the correct server
   $.ajax({ cache: false
          , type: "GET"
          , url: "/recv"
@@ -336,6 +339,7 @@ function longPoll (data) {
 }
 
 //submit a new message to the server
+//TODO: to the right chat
 function send(msg) {
   if (CONFIG.debug === false) {
     // XXX should be POST
@@ -349,7 +353,7 @@ function showConnect () {
   $("#connect").show();
   $("#loading").hide();
   $("#toolbar").hide();
-  $("#nickInput").focus();
+  //$("#nickInput").focus();
 }
 
 //transition the page to the loading screen
@@ -371,6 +375,7 @@ function showChat (nick) {
 }
 
 //we want to show a count of unread messages when the window does not have focus
+//TODO: add chat title
 function updateTitle(){
   if (CONFIG.unread) {
     document.title = "(" + CONFIG.unread.toString() + ") node chat";
@@ -392,7 +397,7 @@ function onConnect (session) {
     return;
   }
 
-  CONFIG.nick = session.nick;
+  CONFIG.name = session.name;
   CONFIG.id   = session.id;
   starttime   = new Date(session.starttime);
   rss         = session.rss;
@@ -400,8 +405,7 @@ function onConnect (session) {
   updateUptime();
 
   //update the UI to show the chat
-  console.log(CONFIG.nick);
-  showChat(CONFIG.nick);
+  showChat(CONFIG.name);
 
   //listen for browser events so we know to update the document title
   $(window).bind("blur", function() {
@@ -418,8 +422,8 @@ function onConnect (session) {
 
 //add a list of present chat members to the stream
 function outputUsers () {
-  var nick_string = nicks.length > 0 ? nicks.join(", ") : "(none)";
-  addMessage("users:", nick_string, new Date(), "notice");
+  var names_string = names.length > 0 ? names.join(", ") : "(none)";
+  addMessage("users:", names_string, new Date(), "notice");
   return false;
 }
 
@@ -427,7 +431,7 @@ function outputUsers () {
 function who () {
   jQuery.get("/who", {}, function (data, status) {
     if (status != "success") return;
-    nicks = data.nicks;
+    names = data.names;
     outputUsers();
   }, "json");
 }
@@ -443,42 +447,6 @@ $(document).ready(function() {
   });
 
   $("#usersLink").click(outputUsers);
-
-  //try joining the chat when the user clicks the connect button
-  $("#connectButton").click(function () {
-    //lock the UI while waiting for a response
-    showLoad();
-    var nick = $("#nickInput").attr("value");
-    console.log(nick);
-
-    //dont bother the backend if we fail easy validations
-    if (nick.length > 50) {
-      alert("Nick too long. 50 character max.");
-      showConnect();
-      return false;
-    }
-
-    //more validations
-    if (/[^\w\W_\-^!]/.exec(nick)) {
-      alert("Bad character in nick. Can only have letters, numbers, and '_', '-', '^', '!'");
-      showConnect();
-      return false;
-    }
-
-    //make the actual join request to the server
-    $.ajax({ cache: false
-           , type: "GET" // XXX should be POST
-           , dataType: "json"
-           , url: "/join"
-           , data: { nick: nick }
-           , error: function () {
-               alert("error connecting to server");
-               showConnect();
-             }
-           , success: onConnect
-           });
-    return false;
-  });
 
   // update the daemon uptime every 10 seconds
   setInterval(function () {

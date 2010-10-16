@@ -4,40 +4,16 @@
     <script src="jquery-1.2.6.min.js" type="text/javascript"></script>
     <script src="client.js" type="text/javascript"></script>
     <script type="text/javascript">
-      function onLogin (name){
+      function onLogin (){
     //lock the UI while waiting for a response
     showLoad();
-    var nick = name;
-    console.log(nick);
-	var intIndexOfMatch;
-	while (intIndexOfMatch != -1){
-		// Relace out the current instance.
-		nick = nick.replace( " ", "_" )
-		 
-		// Get the index of any next matching substring.
-		intIndexOfMatch = nick.indexOf( "th" );
-	}
-
-    //dont bother the backend if we fail easy validations
-    if (nick.length > 50) {
-      alert("Nick too long. 50 character max.");
-      showConnect();
-      return false;
-    }
-
-    //more validations
-    if (/[^\w\W_\-^!]/.exec(nick)) {
-      alert("Bad character in nick. Can only have letters, numbers, and '_', '-', '^', '!'");
-      showConnect();
-      return false;
-    }
 
     //make the actual join request to the server
     $.ajax({ cache: false
            , type: "GET" // XXX should be POST
            , dataType: "json"
            , url: "/join"
-           , data: { nick: nick }
+           , data: { user: CONFIG }
            , error: function () {
                alert("error connecting to server");
                showConnect();
@@ -91,21 +67,19 @@
 		if (response.session) {
       console.log(response);
 			// logged in and connected user, someone you know
-      var person = {};
 			FB.api('/me', function(response) {
-              person.name = response.name;
-              person.profile = response.link;
-              person.id = response.id;
+        CONFIG.name = response.name;
+        CONFIG.url = response.link;
+        CONFIG.id = response.id;
 
-              console.log(response);
-          		//onLogin(response.name);
-        	});
-      console.log(person);
-      console.log('/'+person.id+'/picture');
-      FB.api('/'+person.id+'/picture', function(response) {
-        console.log(response);
-        console.log(person);
-        onLogin(person.name);
+        /*
+        FB.api('/'+CONFIG.id+'/picture', function(response) {
+          console.log(response);
+          onLogin();
+        });
+        */
+
+        onLogin();
       });
               
 		} else {

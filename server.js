@@ -79,18 +79,18 @@ var channel = new function () {
 
 var sessions = {};
 
-function createSession (nick) {
-  if (nick.length > 50) return null;
-  if (/[^\w_\-^!]/.exec(nick)) return null;
+function createSession (user) {
 
   for (var i in sessions) {
     var session = sessions[i];
-    if (session && session.nick === nick) return null;
+    if (session && session.id == user.id) return null;
   }
 
   var session = { 
-    nick: nick, 
-    id: Math.floor(Math.random()*99999999999).toString(),
+    name: user.name, 
+    id: user.id,
+	profile: user.profile,
+	pic: user.pic,
     timestamp: new Date(),
 
     poke: function () {
@@ -141,22 +141,23 @@ fu.get("/who", function (req, res) {
 });
 
 fu.get("/join", function (req, res) {
-  var nick = qs.parse(url.parse(req.url).query).nick;
-  if (nick == null || nick.length == 0) {
-    res.simpleJSON(400, {error: "Bad nick."});
+	var user = qs.parse(url.parse(req.url).query);
+  
+  if (user.id == null) {
+    res.simpleJSON(400, {error: "Bad login."});
     return;
   }
-  var session = createSession(nick);
+  var session = createSession(user);
   if (session == null) {
-    res.simpleJSON(400, {error: "Nick in use"});
+    res.simpleJSON(400, {error: "Already logged in?"});
     return;
   }
 
   //sys.puts("connection: " + nick + "@" + res.connection.remoteAddress);
 
-  channel.appendMessage(session.nick, "join");
+  channel.appendMessage(session.name, "join");
   res.simpleJSON(200, { id: session.id
-                      , nick: session.nick
+                      , name: session.name
                       , rss: mem.rss
                       , starttime: starttime
                       });
@@ -204,6 +205,6 @@ fu.get("/send", function (req, res) {
 
   session.poke();
 
-  channel.appendMessage(session.nick, "msg", text);
+  channel.appendMessage(session.name, "msg", text);
   res.simpleJSON(200, { rss: mem.rss });
 });
