@@ -8,6 +8,7 @@ var CONFIG = { debug: false
              , last_message_time: 1
              , focus: true //event listeners bound in onConnect
              , unread: 0 //updated in the message-processing loop
+			 , token: 0;
              };
 
 var users = [];
@@ -505,17 +506,33 @@ $(document).ready(function() {
   $("#create").click(function(){
 		showLoad();
 		var title = $("#createChat").attr("value");
+		var priv = $('#private').attr('checked');
     	$.ajax({ cache: false
            , type: "GET" // XXX should be POST
            , dataType: "json"
            , url: "/create"
-           , data: { id: CONFIG.id, name: CONFIG.name, profile: CONFIG.url, pic: CONFIG.pic, title: title}
+           , data: { id: CONFIG.id, name: CONFIG.name, profile: CONFIG.url, pic: CONFIG.pic, title: title, nolink: priv}
            , error: function () {
                alert("error creating chat");
                showConnect();
              }
            , success: onConnect
            });				  
+	});
+	
+	  //Refresh the chat list
+  $("#refreshCurrentChats").click(function(){
+		$.ajax({ cache: false
+           , type: "GET" // XXX should be POST
+           , dataType: "json"
+           , url: "/getchats"
+           , data: {}
+           , error: function () {
+               alert("There was an error refreshing the chats. Please try again.");
+               showConnect();
+             }
+           , success: updateChats
+           });		
 	});
 	
 	//Connect to an existing chat

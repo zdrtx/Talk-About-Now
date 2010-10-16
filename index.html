@@ -76,6 +76,7 @@
 			else
 			{
 				$("#newChatForm").slideDown();
+				$("#fbConnect").hide();
 			}
 		}
 	
@@ -84,6 +85,8 @@
 			var mincount = 0;
 			var maxcount = 0;
 			var roomcount = 0;
+			if (chats == null)
+				return;
 			for(c in chats.rooms)
 			{
 				roomcount++;
@@ -93,10 +96,11 @@
 				if(c.population > maxcount)
 					maxcount = c.population;
 			}
+			$("#currentChats").empty();
 			for(c in chats.rooms)
 			{
 				var textsize =  Math.ceil((18*(roomcount - mincount))/(maxcount - mincount));
-				var link = "<a class='joinChat' style='font-size:"+textsize+";' href='"+c+"'>"+chats.rooms[c].title+"</a>";
+				var link = "<a class='joinChat' style='font-size:"+textsize+"px;' href='"+c+"'>"+chats.rooms[c].title+" ("+c.population+")</a>";
 			  //var l = document.createElement("a");
 			  //l.setAttribute('href', c);
 			  //l.innerHTML = chats.rooms[c].title;
@@ -106,6 +110,13 @@
 		}
 	
 		$(document).ready(function(){
+			$("#createChat").focus(function(){
+				$(this).val("").removeClass("faded");
+			}).blur(function(){
+				if($(this).val() == "")
+					$(this).val("Create a new chat group").addClass("faded");
+			});
+								   
 			$.ajax({ cache: false
            , type: "GET" // XXX should be POST
            , dataType: "json"
@@ -130,14 +141,16 @@
       conversation about a new topic, or join an existing one by clicking on a
       chat room below.</p>
 <div id="fbConnect"><h3 style="text-align:center;"><fb:login-button
-    autologoutlink="true"></fb:login-button></h3></div>
+    autologoutlink="true"></fb:login-button></h3>
+   </div>
         <form action="#" id="newChatForm" style="margin:0 auto; display: none;">
           <fieldset> 
             <p>
               Create a Chat</p>
             <input id="createChat">
-            <input name="createChat" type="button" id="create" action="submit" value="Create">
+            <input name="createChat" type="button" id="create" action="submit" value="Create"><br /><input type="checkbox" val="hidden"/> <span style="font-size:90%">Private chat</span>
           </fieldset>
+          <p><strong><a href="#" id="refreshCurrentChats">Refresh current chats</a></strong></p>
 		  <div id="currentChats">
 			
 		</div>
@@ -169,9 +182,10 @@
         CONFIG.name = me.name;
         CONFIG.url = me.link;
         CONFIG.id = me.id;
+		CONFIG.token = encodeURIComponent(response.session.access_token);
         CONFIG.pic =
         'https://graph.facebook.com/'+CONFIG.id+'/picture?access_token='+
-          encodeURIComponent(response.session.access_token);
+          CONFIG.token;
 		loginComplete();
       });
               
