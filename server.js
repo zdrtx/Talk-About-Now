@@ -65,8 +65,9 @@ function createRoom(newRoom) //title, creator)
     var matching = [];
     for (var i = 0; i < messages.length; i++) {
       var message = messages[i];
-      if (message.timestamp > since)
+      if (message.timestamp > since) {
         matching.push(message)
+      }
     }
 
     if (matching.length != 0) {
@@ -103,7 +104,7 @@ function createSession (user) {
 	  for (var i in rooms[user.room].sessions) {
 		var session = rooms[user.room].sessions[i];
 		if (session && session.id == user.id) {
-		  return session;
+		  return null;
 		}
 	  }
     }
@@ -166,7 +167,7 @@ fu.get("/getchats", function (req, res) {
   var allChats = {};
   for(prop in rooms)
   {
-	if(!allChats[prop].priv)
+	if(rooms[prop] && !rooms[prop].priv)
 		allChats[prop] = rooms[prop];
   }
   res.simpleJSON(200, {rooms: allChats});
@@ -256,13 +257,16 @@ fu.get("/create", function (req, res) {
 fu.get("/part", function (req, res) {
   var stuff = qs.parse(url.parse(req.url).query);
 
+
   if (stuff && stuff.room && stuff.id && rooms[stuff.room] && rooms[stuff.room].sessions) {
     session = rooms[stuff.room].sessions[stuff.id];
+    if (session) {
+      session.destroy();
+    }
 	 if(!(--rooms[stuff.room].population))
 	 {
 		delete rooms[stuff.room];
 	 }
-    session.destroy();
   }
 
   // get rid of stuff[room]
@@ -285,10 +289,12 @@ fu.get("/recv", function (req, res) {
 
   var since = parseInt(qs.parse(url.parse(req.url).query).since, 10);
 
+  if (rooms[thing.room]) {
   rooms[thing.room].channel.query(since, function (messages) {
     if (session) session.poke();
     res.simpleJSON(200, { messages: messages, rss: mem.rss });
   });
+  }
 });
 
 fu.get("/send", function (req, res) {
@@ -296,8 +302,9 @@ fu.get("/send", function (req, res) {
   var text = qs.parse(url.parse(req.url).query).text;
   var room = qs.parse(url.parse(req.url).query).room;
 
-
-  var session = rooms[room].sessions[id];
+  if (rooms[room]) {
+    var session = rooms[room].sessions[id];
+  }
   if (!session || !text) {
     res.simpleJSON(400, { error: "No such session id" });
     return;
@@ -305,7 +312,6 @@ fu.get("/send", function (req, res) {
 
   session.poke();
 
-  console.log(session);
   if (rooms[session.room]) {
     var user = {id: session.id, name: session.name, profile: session.profile, 
       pic: session.pic};

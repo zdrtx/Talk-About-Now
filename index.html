@@ -90,17 +90,17 @@
 			for(c in chats.rooms)
 			{
 				roomcount++;
-				usercount += c.population;
-				if(c.population < mincount)
-					mincount = c.population;
-				if(c.population > maxcount)
-					maxcount = c.population;
+				usercount += chats.rooms[c].population;
+				if(chats.rooms[c].population < mincount)
+					mincount = chats.rooms[c].population;
+				if(chats.rooms[c].population > maxcount)
+					maxcount = chats.rooms[c].population;
 			}
 			$("#currentChats").empty();
 			for(c in chats.rooms)
 			{
 				var textsize =  Math.ceil((18*(roomcount - mincount))/(maxcount - mincount));
-				var link = "<a class='joinChat' style='font-size:"+textsize+"px;' href='"+c+"'>"+chats.rooms[c].title+" ("+c.population+")</a>";
+				var link = "<a class='joinChat' style='font-size:"+textsize+"px;'href='"+c+"'>"+chats.rooms[c].title+" ("+chats.rooms[c].population+")</a>";
 			  //var l = document.createElement("a");
 			  //l.setAttribute('href', c);
 			  //l.innerHTML = chats.rooms[c].title;

@@ -364,6 +364,8 @@ function send(msg) {
 
 //Transition the page to the state that prompts the user for a nickname
 function showConnect () {
+  $(".message").remove();
+  $("#log").hide();
   $("#connect").show();
   $("#loading").hide();
   $("#toolbar").hide();
@@ -379,6 +381,7 @@ function showLoad () {
 
 //transition the page to the main chat view, putting the cursor in the textfield
 function showChat (nick) {
+  $("#log").show();
   $("#toolbar").show();
   $("#entry").focus();
 
@@ -435,6 +438,8 @@ function onConnect (session) {
     CONFIG.unread = 0;
     updateTitle();
   });
+
+  $("#roomTitle").html(CONFIG.title);
   longPoll();
 }
 
@@ -487,7 +492,6 @@ $(document).ready(function() {
  );     
     });
 						   
-  //Create a new chat with the specified value
   $("#leave").click(function(){
     	$.ajax({ cache: false
            , type: "GET" // XXX should be POST
