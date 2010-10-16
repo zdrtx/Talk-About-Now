@@ -438,7 +438,17 @@ function onConnect (session) {
 function chatLeft()
 {
 	CONFIG.room = -1;
-	updateChats();
+	$.ajax({ cache: false
+           , type: "GET" // XXX should be POST
+           , dataType: "json"
+           , url: "/getchats"
+           , data: {}
+           , error: function () {
+               alert("error creating chat");
+               showConnect();
+             }
+           , success: updateChats
+           });
 }
 
 //add a list of present chat members to the stream
