@@ -48,29 +48,37 @@
     </style>
 	<script type="text/javascript">
 		function updateChats(chats){
-			for(c in chats.rooms)
+			if(chats)
 			{
-				//var link = "<a class='joinChat' href='"+c+"'>"+chats.rooms[c].title+"</a>";
-			  var l = document.createElement("a");
-			  l.setAttribute('href', c);
-			  l.innerHTML = chats.rooms[c].title;
-        l.className = 'joinChat';
-			  $("#currentChats").append(l);
+				for(c in chats.rooms)
+				{
+					//var link = "<a class='joinChat' href='"+c+"'>"+chats.rooms[c].title+"</a>";
+				  var l = document.createElement("a");
+				  l.setAttribute('href', c);
+				  l.innerHTML = chats.rooms[c].title;
+			l.className = 'joinChat';
+				  $("#currentChats").append(l);
+				}
+			}
+			
+			if(CONFIG.room == -1)
+			{
+				$.ajax({ cache: false
+			   , type: "GET" // XXX should be POST
+			   , dataType: "json"
+			   , url: "/getchats"
+			   , data: {}
+			   , error: function () {
+				   alert("error creating chat");
+				   showConnect();
+				 }
+			   , success: updateChats
+			   });	
 			}
 		}
 	
 		$(document).ready(function(){
-			$.ajax({ cache: false
-           , type: "GET" // XXX should be POST
-           , dataType: "json"
-           , url: "/getchats"
-           , data: {}
-           , error: function () {
-               alert("error creating chat");
-               showConnect();
-             }
-           , success: updateChats
-           });		
+			updateChats();
 		});
 	</script>
   </head>

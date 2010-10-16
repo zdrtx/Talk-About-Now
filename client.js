@@ -431,6 +431,12 @@ function onConnect (session) {
   longPoll();
 }
 
+function chatLeft()
+{
+	CONFIG.room = -1;
+	updateChats();
+}
+
 //add a list of present chat members to the stream
 function outputUsers (names) {
   var names_string = names.length > 0 ? names.join(", ") : "(none)";
@@ -450,6 +456,8 @@ $(document).ready(function() {
 						   
   //Create a new chat with the specified value
   $("#leave").click(function(){
+		showConnect();
+		
     	$.ajax({ cache: false
            , type: "GET" // XXX should be POST
            , dataType: "json"
@@ -459,7 +467,7 @@ $(document).ready(function() {
                alert("error creating chat");
                showConnect();
              }
-           , success: showConnect
+           , success: chatLeft
            });				  
 	});
 
