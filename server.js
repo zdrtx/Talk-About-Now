@@ -141,10 +141,10 @@ fu.get("/who", function (req, res) {
 });
 
 fu.get("/join", function (req, res) {
-	var user = qs.parse(url.parse(req.url).query);
-	alert(user.id);
-	alert(qs.parse(url.parse(req.url).query).id);
-  
+	var user = qs.parse(url.parse(req.url).query).user;
+	console.log("------------------------------");
+    console.log(user.id);
+	console.log("==================================");
   if (user.id == null) {
     res.simpleJSON(400, {error: "Bad login."});
     return;
