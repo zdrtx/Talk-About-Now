@@ -100,7 +100,7 @@
 			for(c in chats.rooms)
 			{
 				var textsize =  Math.ceil((18*(roomcount - mincount))/(maxcount - mincount));
-				var link = "<a class='joinChat' style='font-size:"+textsize+"px;' href='"+c+"'>"+chats.rooms[c].title+" ("+c.population+")</a>";
+				var link = "<a class='joinChat' style='font-size:"+textsize+"px;' href='"+c+"'>"+chats.rooms[c].title+" ("+chats.rooms[c].population+")</a>";
 			  //var l = document.createElement("a");
 			  //l.setAttribute('href', c);
 			  //l.innerHTML = chats.rooms[c].title;
@@ -185,7 +185,11 @@
 		CONFIG.token = encodeURIComponent(response.session.access_token);
         CONFIG.pic =
         'https://graph.facebook.com/'+CONFIG.id+'/picture?access_token='+
-          CONFIG.token;
+        CONFIG.token;
+		/*FB.api('/me/friends', function(response) {
+		   CONFIG.friends = response.data;
+		});*/
+
 		loginComplete();
       });
               

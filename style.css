@@ -37,7 +37,6 @@ a:hover { text-decoration: underline; color: #aaa; }
 
 #loading p, #connect fieldset  {
   font-family: DejaVu Sans Mono, fixed; 
-  width: 30em;
   border: 0;
 }
 
