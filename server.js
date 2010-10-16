@@ -26,8 +26,8 @@ function createRoom(newRoom) //title, creator)
 {
 	var id = randomString();
   rooms[id] = {};
-  console.log('lololol');
-  console.log(rooms[id]);
+  rooms[id].population = 1;
+
 	rooms[id].channel = new function () {
   var messages = [],
       callbacks = [];
@@ -122,9 +122,6 @@ function createSession (user) {
     }
   };
 
-  console.log('boom');
-  console.log(session.room);
-
   rooms[user.room].sessions[session.id] = session;
   return session;
 }
@@ -183,8 +180,6 @@ fu.get("/join", function (req, res) {
     return;
   }
   var session = createSession(user);
-  console.log('OMG');
-  console.log(session);
   if (session == null) {
     res.simpleJSON(400, {error: "Already logged in?"});
     return;
@@ -206,20 +201,13 @@ fu.get("/create", function (req, res) {
 	
 	var newroom = qs.parse(url.parse(req.url).query);
 	var title = newroom.title;
-	
-  console.log('newroomnewroomnewroom');
-  console.log(newroom);
   if (newroom.id == 'null') {
     res.simpleJSON(400, {error: "Bad login."});
     return;
   }
   var roomId = createRoom({title: newroom.title, name: newroom.name});
   newroom.room = roomId;
-  console.log('YESYESYES');
-  console.log(newroom);
   var session = createSession(newroom);
-  console.log('roller');
-  console.log(session);
   if (session == null) {
     res.simpleJSON(400, {error: "Already logged in?"});
     return;
@@ -242,6 +230,10 @@ fu.get("/part", function (req, res) {
 
   if (stuff && stuff.room && stuff.id && rooms[stuff.room]) {
     session = rooms[stuff.room].sessions[stuff.id];
+	 if(!(rooms[stuff.room].population--))
+	 {
+		delete rooms[stuff.room];
+	 }
     session.destroy();
   }
 
@@ -258,9 +250,6 @@ fu.get("/recv", function (req, res) {
   }
   var id = qs.parse(url.parse(req.url).query).id;
   var session;
-  console.log('oh hai');
-  console.log(thing);
-  console.log(thing.room);
   if (id && rooms[thing.room].sessions[id]) {
     session = rooms[thing.room].sessions[id];
     session.poke();
@@ -279,8 +268,6 @@ fu.get("/send", function (req, res) {
   var text = qs.parse(url.parse(req.url).query).text;
   var room = qs.parse(url.parse(req.url).query).room;
 
-  console.log('wtf');
-  console.log(room);
   var session = rooms[room].sessions[id];
   if (!session || !text) {
     res.simpleJSON(400, { error: "No such session id" });

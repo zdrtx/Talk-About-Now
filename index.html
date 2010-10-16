@@ -8,12 +8,14 @@
 	<script type="text/javascript">
 		function updateChats(chats){
 			for(c in chats.rooms)
-      {
+			{
 				//var link = "<a class='joinChat' href='"+c+"'>"+chats.rooms[c].title+"</a>";
-        var l = document.createElement("a");
-        a.href = c;
-          $("#currentChats").append(a);
-          a.innerHTML = chats.rooms[c].title;
+			  var l = document.createElement("a");
+			  link.setAttribute('href', 'mypage.htm');
+			  l.setAttribute('href', c);
+			  l.innerHTML = chats.rooms[c].title;
+			  $("#currentChats").append(l);
+			}
 		}
 	
 		$(document).ready(function(){
