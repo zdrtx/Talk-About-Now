@@ -67,8 +67,8 @@
            , url: "/join"
            , data: { room: chat, id: CONFIG.id, name: CONFIG.name, profile: CONFIG.url, pic: CONFIG.pic}
            , error: function () {
-               alert("error creating chat");
-               showConnect();
+			   alert("There was an error joining the chat you specified.");
+                window.location = "/";
              }
            , success: onConnect
            });
@@ -112,7 +112,7 @@
            , url: "/getchats"
            , data: {}
            , error: function () {
-               alert("error creating chat");
+               alert("There was an error creating the chat you requested. Please try again.");
                showConnect();
              }
            , success: updateChats
@@ -129,7 +129,7 @@
       conversation about a new topic or join an existing one by clicking on a
       chat room below.</p>
 <div id="fbConnect"><h3 style="text-align:center;"><fb:login-button
-    autologoutlink="true"></fb:login-button> Log in with Facebook</h3></div>
+    autologoutlink="true"></fb:login-button></h3></div>
         <form action="#" id="newChatForm" style="margin:0 auto; display: none;">
           <fieldset> 
             <p>
