@@ -9,6 +9,35 @@
       .joinChat {
         padding: 10px;
       }
+	  #createChat
+	  {
+		border:1px solid #777777;
+		font-family:inherit;
+		font-size:15px;
+		padding:4px;
+		width:400px;
+	  }
+	  
+	  #create{
+		-moz-border-radius:2px 2px 2px 2px;
+		background-color:#333333;
+		border:1px solid #333333;
+		color:#FFFFFF;
+		font-family:inherit;
+		font-size:15px;
+		font-weight:bold;
+		margin-left:3px;
+		padding:3px 8px 4px;
+		text-shadow:0 1px 2px #000000;
+	  }
+	  
+	  #app
+	  {
+		  width:900px;
+		  margin:0 auto;
+		  padding:15px;
+		  border:1px solid #333;
+	  }
     </style>
 	<script type="text/javascript">
 		function updateChats(chats){
@@ -42,7 +71,6 @@
     <div id="app">
       <div id="connect">
 <div id="fbConnect"><fb:login-button autologoutlink="true"></fb:login-button></div>
-        <div id="name"></div>
         <form action="#">
           <fieldset> 
             <p>
@@ -64,6 +92,7 @@
           <li><a href="#" id="leave">leave chat</a></li>
         </ul>
         <input tabindex="1" type="text" id="entry"/>
+      </div>
       </div>
     <div id="fb-root"></div>
     <script>
