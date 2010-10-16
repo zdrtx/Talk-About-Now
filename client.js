@@ -443,7 +443,7 @@ function chatLeft()
 
 //add a list of present chat members to the stream
 function outputUsers (names) {
-  var names = [];
+  var pics = [];
   for (var i = 0; i < users.length; i++ ) {
     var user = users[i];
     pics.push("<a title='"+user.name+"' target='blank' href='"+user.profile+"'><img src='"+

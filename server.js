@@ -153,7 +153,7 @@ fu.get("/client.js", fu.staticHandler("client.js"));
 fu.get("/jquery-1.2.6.min.js", fu.staticHandler("jquery-1.2.6.min.js"));
 
 
-var chatListUpdateRequests [];
+var chatListUpdateRequests = [];
 
 fu.get("/getchats", function (req, res) {
 
@@ -161,17 +161,17 @@ fu.get("/getchats", function (req, res) {
   
 });
 
-updateChatListListeners()
+function updateChatListListeners()
 {
   var allChats = {};
   for(prop in rooms)
   {
 	allChats[prop] = rooms[prop];
   }
-  while (requests.length) {
-		response = requests.shift();
+  while (chatListUpdateRequests.length) {
+		response = chatListUpdateRequests.shift();
 		response.simpleJSON(200, { rooms: allChats
-        };
+        });
 	}
 }
 
