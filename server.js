@@ -194,7 +194,9 @@ fu.get("/create", function (req, res) {
 	var newroom = qs.parse(url.parse(req.url).query);
 	var title = newroom.title;
 	
-  if (newroom.id == null) {
+  console.log('newroomnewroomnewroom');
+  console.log(newroom);
+  if (newroom.id == 'null') {
     res.simpleJSON(400, {error: "Bad login."});
     return;
   }
@@ -216,6 +218,8 @@ fu.get("/create", function (req, res) {
   console.log('bambam');
   res.simpleJSON(200, { id: newroom.id
                       , name: newroom.name
+                      , room: newroom.room
+                      , rss: mem.rss
                       , starttime: starttime
                       });
   console.log('never will happen');
