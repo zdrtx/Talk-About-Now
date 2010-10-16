@@ -86,23 +86,23 @@
         FB.init({appId: '165425556817740', status: true, cookie: true,
                  xfbml: true});
         
+		FB.getLoginStatus(function(response) {
+		if (response.session) {
+			// logged in and connected user, someone you know
+			FB.api('/me', function(response) {
+          		onLogin(response.name);
+        	});
+		} else {
+		// no user session available, someone you dont know
+		}
+		});
+		
         FB.Event.subscribe('auth.login', function(response) {
           // do something with response.session
           	FB.api('/me', function(response) {
           		onLogin(response.name);
         	});
         });
-		FB.Event.subscribe('auth.sessionChange', function(response) {
-			if (response.session) {
-				FB.api('/me', function(response) {
-					onLogin(response.name);
-				});
-			// A user has logged in, and a new cookie has been saved
-			} else {
-			// The user has logged out, and the cookie has been cleared
-			
-		}
-  });
       };
       (function() {
         var e = document.createElement('script');
