@@ -8,7 +8,7 @@ var CONFIG = { debug: false
              , last_message_time: 1
              , focus: true //event listeners bound in onConnect
              , unread: 0 //updated in the message-processing loop
-			 , token: 0;
+			 , token: 0
              };
 
 var users = [];
