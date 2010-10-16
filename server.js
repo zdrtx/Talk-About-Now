@@ -147,6 +147,7 @@ fu.get("/join", function (req, res) {
     return;
   }
   var session = createSession(user);
+  console.log(session);
   if (session == null) {
     res.simpleJSON(400, {error: "Already logged in?"});
     return;

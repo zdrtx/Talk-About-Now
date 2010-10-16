@@ -14,7 +14,7 @@
            , type: "GET" // XXX should be POST
            , dataType: "json"
            , url: "/join"
-           , data: { id: CONFIG.id, name: CONFIG.name, url: CONFIG.url, pic: CONFIG.pic }
+           , data: { id: CONFIG.id, name: CONFIG.name, profile: CONFIG.url, pic: CONFIG.pic }
            , error: function () {
                alert("error connecting to server");
                showConnect();
@@ -67,18 +67,13 @@
 		FB.getLoginStatus(function(response) {
 		if (response.session) {
 			// logged in and connected user, someone you know
-			FB.api('/me', function(response) {
-        CONFIG.name = response.name;
-        CONFIG.url = response.link;
-        CONFIG.id = response.id;
-
-        /*
-        FB.api('/'+CONFIG.id+'/picture', function(response) {
-          console.log(response);
-          onLogin();
-        });
-        */
-
+			FB.api('/me', function(me) {
+        CONFIG.name = me.name;
+        CONFIG.url = me.link;
+        CONFIG.id = me.id;
+        CONFIG.pic =
+        'https://graph.facebook.com/'+CONFIG.id+'/picture?access_token='+
+          encodeURIComponent(response.session.access_token);
         onLogin();
       });
               
